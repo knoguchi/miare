@@ -82,7 +82,6 @@ def generate_support_voice(
         end = start + harmonic_slice.duration
         if end <= melody_start or start >= melody_end:
             continue
-        melody_onsets = [e for e in song.melody if start <= e.start < end]
         sub_spans = [(start, harmonic_slice.duration)]
         borrowed_rhythm = False
         if (
