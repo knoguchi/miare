@@ -18,6 +18,7 @@ Structural rules (DESIGN.md §7.7):
 """
 from __future__ import annotations
 
+from dataclasses import replace
 from fractions import Fraction
 from pathlib import Path
 
@@ -373,6 +374,32 @@ class TestSupportAnchorsToPlanningMelody:
             assert _melody_anchor(song, event.start, event.end) == (
                 _counterpoint_melody_anchor(song, event.start, event.end)
             ), f"anchors disagree over structural {event.id}"
+
+    def test_anchor_falls_back_to_surface_melody_when_no_reduction(self) -> None:
+        # Half of the AC: `song.structural_melody or song.melody`.  A score the
+        # reduction produced nothing for must still anchor, not return None for
+        # every slot and switch the spacing penalties off wholesale.
+        _, song = _pruned_song()
+        unreduced = replace(song, structural_melody=[])
+        anchored = 0
+        for event in song.melody:
+            expected = _melody_anchor(song, event.start, event.end)
+            actual = _melody_anchor(unreduced, event.start, event.end)
+            if event.pitch is not None:
+                assert actual == event.pitch.midi, (
+                    f"with no structural melody, the slot over {event.id} "
+                    f"anchored to {actual}; expected its own surface pitch "
+                    f"{event.pitch.midi}"
+                )
+                anchored += 1
+            # And the fallback is a real fallback: over a pruned note the two
+            # disagree, which is what the reduction is for.
+            if event.id in {e.id for e in _pruned_events(song)}:
+                assert actual != expected, (
+                    f"fallback over pruned {event.id} matched the structural "
+                    f"anchor; the fixture or the fallback is not exercised"
+                )
+        assert anchored, "fixture has no pitched melody notes"
 
 
 # ---------------------------------------------------------------------------
