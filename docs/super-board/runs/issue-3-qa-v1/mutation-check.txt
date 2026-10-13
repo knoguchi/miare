@@ -1,0 +1,6 @@
+unprepared-strong-dissonance -> 1 failed, 33 passed in 0.03s
+unapproached-weak-dissonance -> 1 failed, 33 passed in 0.02s
+protected-strong-dissonance -> 1 failed, 33 passed in 0.03s
+leap-over-octave -> 2 failed, 32 passed in 0.03s
+parallel-perfects -> 1 failed, 33 passed in 0.03s
+protected-voice-crossing -> 1 failed, 33 passed in 0.03s

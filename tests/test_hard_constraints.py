@@ -9,13 +9,17 @@ The gate is pure: given a slot, a beam state, a candidate pitch and the
 precomputed slot context it returns a `Rejection` or `None`. No arrangement
 round trip, no analysis, no RNG.
 
-Covered here: the five rejections that were the scorer's lines 552, 586, 598,
-600 and 602 — the rest ban, the tonality ban and the three owed-resolution
-rules. The six state-dependent rules (strong- and weak-beat dissonance, the
-protected-phrase dissonance ban, the octave leap cap, parallel perfects and
-protected voice crossing) are enforced by the same gate but still only covered
-through the arrangement in `tests/test_voice_leading.py`; unit tests for them
-are a follow-up card, kept out of this PR to stay under the 400-line cap.
+All eleven rules are covered. The first five — the rest ban, the tonality ban
+and the three owed-resolution rules — were the scorer's lines 552, 586, 598,
+600 and 602. The six state-dependent ones (strong- and weak-beat dissonance,
+the protected-phrase dissonance ban, the octave leap cap, parallel perfects
+and protected voice crossing) were lines 609, 615, 624, 629, 659 and 672, and
+QA added their tests. Each rule gets a rejection case and a near-miss case
+that must pass, so a rule that stopped firing fails a test instead of going
+quiet.
+
+`tests/test_voice_leading.py` keeps the arrangement-level checks: they show
+the beam search honours the gate, not that any one rule works.
 """
 from __future__ import annotations
 
@@ -87,7 +91,7 @@ def _check(
 
 
 # ---------------------------------------------------------------------------
-# The five rules this PR covers (the scorer's old lines 552, 586, 598, 600, 602)
+# The five state-free rules (the scorer's old lines 552, 586, 598, 600, 602)
 # ---------------------------------------------------------------------------
 
 class TestRestRules:
@@ -168,6 +172,156 @@ class TestPendingResolutionRules:
         rejection = _check(_slot(), state, 60, _context())
         assert rejection is not None
         assert rejection.rule == "resolution-must-rise"
+
+
+# ---------------------------------------------------------------------------
+# The six state-dependent rules (the scorer's old lines 609, 615, 624, 629,
+# 659, 672). Added by QA: the arrangement tests in test_voice_leading.py only
+# show that one fixture produces no violation, which cannot tell a working
+# rule from a rule that never fires.
+# ---------------------------------------------------------------------------
+
+# Against melody 72, consonant interval classes are 0, 3, 4, 7, 8, 9. MIDI 62
+# sits an interval class 10 below it, so it is dissonant — and D is in C major,
+# so the tonality rule (which the gate checks first) stays out of the way.
+DISSONANT_MIDI = 62
+
+
+class TestStrongBeatDissonanceRule:
+    """On a strong beat a dissonance is only legal as a held suspension."""
+
+    def test_fresh_strong_beat_dissonance_rejected(self) -> None:
+        state = BeamState(previous_midi=60)
+        rejection = _check(_slot(metric_strength=0.7), state, DISSONANT_MIDI, _context())
+        assert rejection is not None
+        assert rejection.rule == "unprepared-strong-dissonance"
+
+    def test_held_pitch_passes_as_a_suspension(self) -> None:
+        state = BeamState(previous_midi=DISSONANT_MIDI)
+        assert _check(_slot(metric_strength=0.7), state, DISSONANT_MIDI, _context()) is None
+
+
+class TestWeakBeatDissonanceRule:
+    """On a weak beat a dissonance needs a stepwise approach."""
+
+    def test_stepwise_approach_passes(self) -> None:
+        state = BeamState(previous_midi=60)
+        assert _check(_slot(metric_strength=0.4), state, DISSONANT_MIDI, _context()) is None
+
+    def test_leaping_approach_rejected(self) -> None:
+        # A is in key and consonant, so only the leap of 5 can be the reason.
+        state = BeamState(previous_midi=57)
+        rejection = _check(_slot(metric_strength=0.4), state, DISSONANT_MIDI, _context())
+        assert rejection is not None
+        assert rejection.rule == "unapproached-weak-dissonance"
+
+    def test_repeated_pitch_rejected(self) -> None:
+        # Motion 0 is not a step, so a weak-beat dissonance cannot be restruck.
+        state = BeamState(previous_midi=DISSONANT_MIDI)
+        rejection = _check(_slot(metric_strength=0.4), state, DISSONANT_MIDI, _context())
+        assert rejection is not None
+        assert rejection.rule == "unapproached-weak-dissonance"
+
+    def test_dissonance_without_a_previous_note_rejected(self) -> None:
+        rejection = _check(_slot(metric_strength=0.4), BeamState(), DISSONANT_MIDI, _context())
+        assert rejection is not None
+        assert rejection.rule == "unapproached-weak-dissonance"
+
+
+class TestProtectedPhraseDissonanceRule:
+    """A protected phrase bars a strong-beat dissonance the suspension
+    exception would otherwise allow."""
+
+    def test_suspension_rejected_inside_a_protected_phrase(self) -> None:
+        state = BeamState(previous_midi=DISSONANT_MIDI)
+        slot = _slot(metric_strength=0.7, identity_policy="protected")
+        rejection = _check(slot, state, DISSONANT_MIDI, _context())
+        assert rejection is not None
+        assert rejection.rule == "protected-strong-dissonance"
+
+    def test_the_same_suspension_passes_in_a_free_phrase(self) -> None:
+        state = BeamState(previous_midi=DISSONANT_MIDI)
+        slot = _slot(metric_strength=0.7, identity_policy="free")
+        assert _check(slot, state, DISSONANT_MIDI, _context()) is None
+
+
+class TestLeapRule:
+    """The counterline may leap an octave, not more."""
+
+    def test_octave_leap_passes(self) -> None:
+        state = BeamState(previous_midi=48)
+        assert _check(_slot(), state, 60, _context()) is None
+
+    def test_leap_over_an_octave_rejected(self) -> None:
+        state = BeamState(previous_midi=47)
+        rejection = _check(_slot(), state, 60, _context())
+        assert rejection is not None
+        assert rejection.rule == "leap-over-octave"
+
+    def test_downward_leap_over_an_octave_rejected(self) -> None:
+        state = BeamState(previous_midi=65)
+        rejection = _check(_slot(), state, 52, _context())
+        assert rejection is not None
+        assert rejection.rule == "leap-over-octave"
+
+    def test_first_note_has_no_leap_to_measure(self) -> None:
+        # previous_midi None means motion is 0, so the cap cannot fire.
+        assert _check(_slot(), BeamState(), 36, _context()) is None
+
+
+class TestParallelPerfectsRule:
+    """Two perfect intervals in a row, both voices moving the same way."""
+
+    def test_parallel_fifths_rejected(self) -> None:
+        # Melody 60 → 72 rises; counterline 53 → 65 rises. Both intervals are
+        # interval class 7.
+        state = BeamState(previous_midi=53, previous_melody=60, previous_interval_class=7)
+        rejection = _check(_slot(), state, 65, _context(melody_midi=72))
+        assert rejection is not None
+        assert rejection.rule == "parallel-perfects"
+
+    def test_contrary_motion_into_a_fifth_passes(self) -> None:
+        # Melody 74 → 72 falls while the counterline 64 → 65 rises.
+        state = BeamState(previous_midi=64, previous_melody=74, previous_interval_class=7)
+        assert _check(_slot(), state, 65, _context(melody_midi=72)) is None
+
+    def test_parallel_motion_into_a_third_passes(self) -> None:
+        # Interval class 9 is consonant but not perfect, so the rule is silent.
+        state = BeamState(previous_midi=52, previous_melody=60, previous_interval_class=9)
+        assert _check(_slot(), state, 64, _context(melody_midi=72)) is None
+
+    def test_rule_is_silent_on_the_first_slot(self) -> None:
+        # No previous melody note means there is no motion to call parallel.
+        state = BeamState(previous_midi=53, previous_melody=None, previous_interval_class=7)
+        assert _check(_slot(), state, 65, _context(melody_midi=72)) is None
+
+
+class TestProtectedVoiceCrossingRule:
+    """In a protected phrase the counterline stays below the melody unless the
+    instrument floor leaves it nowhere to go."""
+
+    def test_crossing_above_a_protected_melody_rejected(self) -> None:
+        # Melody 72 is 36 semitones above the cello floor, so staying below is
+        # possible and crossing is a choice.
+        slot = _slot(identity_policy="protected")
+        rejection = _check(slot, BeamState(previous_midi=72), 72, _context(melody_midi=72))
+        assert rejection is not None
+        assert rejection.rule == "protected-voice-crossing"
+
+    def test_crossing_allowed_when_the_melody_sits_on_the_floor(self) -> None:
+        # Melody 38 leaves under 3 semitones above the cello floor of 36.
+        slot = _slot(identity_policy="protected")
+        context = _context(melody_midi=38, tonal_pcs=C_MAJOR_PCS)
+        assert _check(slot, BeamState(previous_midi=38), 38, context) is None
+
+    def test_crossing_allowed_in_a_free_phrase(self) -> None:
+        # Scored with a penalty rather than banned — not the gate's business.
+        slot = _slot(identity_policy="free")
+        assert _check(slot, BeamState(previous_midi=72), 72, _context(melody_midi=72)) is None
+
+    def test_staying_below_the_melody_passes(self) -> None:
+        slot = _slot(identity_policy="protected")
+        assert _check(slot, BeamState(previous_midi=60), 60, _context(melody_midi=72)) is None
 
 
 class TestGateIsTotal:
