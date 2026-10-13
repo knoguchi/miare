@@ -216,3 +216,16 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Arrangement runs. miare regenerates these from a source score plus a seed,
+# so they are outputs rather than inputs. Test fixtures are exempted below
+# because the suite reads them.
+*.miare.json
+*.mscz
+/*.musicxml
+!tests/fixtures/*.musicxml
+
+# super-board local state (worktrees and the per-machine active pointer)
+.claude/worktrees/
+.claude/super-board/active
+.claude/super-board/inflight/
