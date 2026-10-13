@@ -8,10 +8,10 @@ from miare.analysis import analyze_score
 from miare.cli import main
 from miare.counterpoint import arrange_countermelody
 from miare.generation import arrange_support, validate_arrangement
+from miare.instruments import generated_from_source
 from miare.ir import Event, Pitch
 from miare.musicxml import (
     _duration_notation,
-    generated_from_source,
     parse_musicxml,
     validate_round_trip,
     write_arrangement,
