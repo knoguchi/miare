@@ -1,8 +1,8 @@
 """
 Voice leading rule tests grounded in species counterpoint and SATB pedagogy.
 
-Hard rules tested here (violations → return None in the scorer, so they are
-provably never generated):
+Hard rules tested here (`check_hard_constraints` rejects a violation before
+any scoring runs, so they are provably never generated):
   - No parallel perfect intervals (5ths or octaves) in countermelody
   - No oblique-motion unison to unison at cadence in countermelody
   - Countermelody stays below primary melody (voice crossing penalty is hard
@@ -81,7 +81,7 @@ def _voice_crossings(
 
 
 # ---------------------------------------------------------------------------
-# Countermelody: hard rules from _score_action
+# Countermelody: hard rules from check_hard_constraints
 # ---------------------------------------------------------------------------
 
 def _get_countermelody(seed: int = 5) -> tuple:
@@ -96,12 +96,13 @@ def _get_countermelody(seed: int = 5) -> tuple:
 
 
 class TestCounterpointHardRules:
-    """These rules are enforced by returning None in _score_action, making
-    violations structurally impossible regardless of seed or input."""
+    """These rules are enforced by `check_hard_constraints`, which runs before
+    any scoring, making violations structurally impossible regardless of seed
+    or input. The rules themselves are unit-tested in
+    `tests/test_hard_constraints.py`; these tests check the arrangement the
+    beam search actually produces."""
 
     def test_no_parallel_perfect_intervals(self) -> None:
-        # The scorer returns None when consecutive intervals are both perfect
-        # and motion is parallel (counterpoint.py lines 655-659).
         _, _, melody, counter = _get_countermelody()
         violations = _parallel_perfect_pairs(melody, counter)
         assert not violations, (
@@ -109,7 +110,6 @@ class TestCounterpointHardRules:
         )
 
     def test_melodic_leap_never_exceeds_octave(self) -> None:
-        # Leap > 12 semitones is hard-banned (counterpoint.py line 628).
         _, _, _, counter = _get_countermelody()
         midis = [ev.pitch.midi for ev in sorted(counter, key=lambda e: e.start)]
         for left, right in zip(midis, midis[1:]):
@@ -129,9 +129,9 @@ class TestCounterpointHardRules:
 
     def test_pending_dissonance_resolves_stepwise(self) -> None:
         # After a dissonance is created, the next note must move by step (≤2).
-        # The scorer returns None for abs(motion) > 2 when pending_resolution
-        # is set.  We verify indirectly: no large leap immediately follows a
-        # dissonant interval.
+        # The gate rejects abs(motion) > 2 when pending_resolution is set
+        # (`resolution-not-consonant-step`).  We verify indirectly here: no
+        # large leap immediately follows a dissonant interval.
         _, _, melody, counter = _get_countermelody()
         pairs = _simultaneous_intervals(melody, counter)
         for i in range(len(pairs) - 1):
@@ -150,8 +150,9 @@ class TestCounterpointHardRules:
 
     def test_no_voice_crossing_in_protected_phrase(self) -> None:
         # The first phrase has identity_policy="protected".  Voice crossing
-        # in a protected phrase with melody_midi - profile.min_midi >= 3
-        # hard-returns None, so the generated voice must stay below the melody.
+        # in a protected phrase with melody_midi - profile.min_midi >= 3 is
+        # rejected (`protected-voice-crossing`), so the generated voice must
+        # stay below the melody.
         source, song, melody, counter = _get_countermelody()
         first_phrase = song.phrases[0]
         phrase_pairs = [

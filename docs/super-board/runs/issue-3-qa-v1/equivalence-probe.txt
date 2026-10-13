@@ -1,0 +1,2 @@
+combinations checked: 1797120
+accept/reject mismatches: 0
