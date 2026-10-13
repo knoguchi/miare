@@ -19,11 +19,10 @@ from miare.analysis import (
     _chord_vocabulary,
     _transition,
     analyze_score,
-    detect_phrases,
     reduce_to_structural_melody,
     tonic_from_signature,
 )
-from miare.ir import Event, HarmonicSlice, Measure, Phrase, Pitch, SourceScore
+from miare.ir import Event, Measure, Phrase, Pitch, SourceScore
 from miare.musicxml import parse_musicxml
 
 
@@ -302,7 +301,6 @@ class TestStructuralReduction:
     def test_strong_beat_note_retained_even_if_passing(self) -> None:
         # A note on a downbeat (position 0 or multiple of beat) is "strong"
         # and must survive regardless of its melodic role
-        source = _source_22(1)
         m = [
             _ev("n0", "A", 3, Fraction(0), Fraction(2)),  # beat 1, strong
             _ev("n1", "B", 3, Fraction(2), Fraction(2)),  # beat 2, strong (pos=2, 2%2=0)
