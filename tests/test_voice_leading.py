@@ -12,6 +12,9 @@ Soft but statistically reliable rules (verified on fixed seeds):
   - Support voice generally stays below melody (large penalty, not hard ban)
   - Cadential support note lands on harmonic root (bonus ensures it on simple input)
   - Register separation: voices stay a 3rd or more apart most of the time
+
+Structural rules (DESIGN.md §7.7):
+  - Both voices anchor to the structural melody, never to a pruned passing tone
 """
 from __future__ import annotations
 
@@ -19,13 +22,16 @@ from fractions import Fraction
 from pathlib import Path
 
 from miare.analysis import analyze_score
+from miare.counterpoint import _melody_anchor as _counterpoint_melody_anchor
 from miare.counterpoint import arrange_countermelody
-from miare.generation import arrange_support
+from miare.generation import _melody_anchor, _support_spans, arrange_support
+from miare.instruments import get_profile
 from miare.ir import GeneratedEvent
 from miare.musicxml import parse_musicxml
 
 
 FIXTURE = Path(__file__).parent / "fixtures" / "simple_melody.musicxml"
+PRUNING_FIXTURE = Path(__file__).parent / "fixtures" / "passing_tones.musicxml"
 
 PERFECT_ICS = {0, 7}   # unison/octave and perfect fifth (mod 12)
 CONSONANT_ICS = {0, 3, 4, 7, 8, 9}
@@ -266,6 +272,107 @@ class TestSupportVoiceRules:
                 f"Contrary motion ratio {ratio:.2f} is low "
                 f"({contrary}/{total} pairs)"
             )
+
+
+# ---------------------------------------------------------------------------
+# Support voice anchors against the planning melody (DESIGN.md §7.7)
+# ---------------------------------------------------------------------------
+
+def _pruned_song() -> tuple:
+    source = parse_musicxml(PRUNING_FIXTURE)
+    return source, analyze_score(source)
+
+
+def _pruned_events(song) -> list:
+    """Melody notes the structural reduction removed."""
+    structural_ids = {event.id for event in song.structural_melody}
+    return [event for event in song.melody if event.id not in structural_ids]
+
+
+class TestSupportAnchorsToPlanningMelody:
+    """DESIGN.md §7.7: the search unit is the structural melody.  An ornamental
+    passing tone that `reduce_to_structural_melody` removed must not be the
+    pitch the support voice is scored against, or the accompaniment is dragged
+    toward surface notes and over-densifies."""
+
+    def test_fixture_actually_prunes(self) -> None:
+        # Without pruning this fixture proves nothing about the anchor.
+        _, song = _pruned_song()
+        assert len(song.structural_melody) < len(song.melody), (
+            f"{PRUNING_FIXTURE.name} must contain passing tones the reduction "
+            f"removes: melody={len(song.melody)} structural="
+            f"{len(song.structural_melody)}"
+        )
+
+    def test_anchor_returns_structural_pitch_over_passing_tone(self) -> None:
+        _, song = _pruned_song()
+        structural_midis = {event.pitch.midi for event in song.structural_melody}
+        pruned = _pruned_events(song)
+        assert pruned, "fixture has no pruned notes"
+        for passing in pruned:
+            anchor = _melody_anchor(song, passing.start, passing.end)
+            assert anchor is not None, (
+                f"no anchor for the slot over pruned {passing.id}"
+            )
+            assert anchor != passing.pitch.midi, (
+                f"slot over pruned {passing.id} anchored to the passing tone "
+                f"{passing.pitch.midi} instead of a structural pitch"
+            )
+            assert anchor in structural_midis, (
+                f"anchor {anchor} is not a structural pitch"
+            )
+
+    def test_generated_slot_over_passing_tone_anchors_structurally(self) -> None:
+        # Read the anchor off the slots the Viterbi really scores, so the test
+        # cannot pass on a wider window than the generator used.
+        _, song = _pruned_song()
+        pruned = _pruned_events(song)
+        assert pruned, "fixture has no pruned notes"
+        checked = 0
+        for span in _support_spans(song, get_profile("cello")):
+            end = span["start"] + span["duration"]
+            inside = [
+                event for event in pruned
+                if event.start >= span["start"] and event.end <= end
+            ]
+            if not inside:
+                continue
+            checked += 1
+            # The slot sits inside a pruned region, so the structural note that
+            # governs it is the last one ending at or before the slot start.
+            governing = max(
+                (
+                    event for event in song.structural_melody
+                    if event.end <= span["start"]
+                ),
+                key=lambda event: event.end,
+            )
+            assert span["melody_midi"] == governing.pitch.midi, (
+                f"slot {span['start']}–{end} covering pruned "
+                f"{[event.id for event in inside]} anchored to "
+                f"{span['melody_midi']}; expected the governing structural "
+                f"note {governing.id} ({governing.pitch.midi}), and the "
+                f"passing tone is {inside[0].pitch.midi}"
+            )
+        assert checked, "no generated slot covers a pruned passing tone"
+
+    def test_both_anchors_share_one_signature(self) -> None:
+        # The two modules took (start, duration) vs (start, end); copying a call
+        # between them silently produced a wrong time window.
+        import inspect
+
+        assert (
+            list(inspect.signature(_melody_anchor).parameters)
+            == list(inspect.signature(_counterpoint_melody_anchor).parameters)
+            == ["song", "start", "end"]
+        )
+
+    def test_anchor_matches_counterpoint_where_structural_notes_overlap(self) -> None:
+        _, song = _pruned_song()
+        for event in song.structural_melody:
+            assert _melody_anchor(song, event.start, event.end) == (
+                _counterpoint_melody_anchor(song, event.start, event.end)
+            ), f"anchors disagree over structural {event.id}"
 
 
 # ---------------------------------------------------------------------------
