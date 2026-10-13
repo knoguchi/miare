@@ -17,14 +17,6 @@ from .ir import (
 from .musicxml import generated_from_source
 
 
-def _chord_pitch_classes(harmonic_slice: HarmonicSlice) -> set[int]:
-    root = harmonic_slice.selected.root_pc
-    quality = harmonic_slice.selected.quality
-    third = 4 if quality == "major" else 3
-    fifth = 6 if quality == "diminished" else 7
-    return {root, (root + third) % 12, (root + fifth) % 12}
-
-
 def _melody_anchor(song: SongIR, start: Fraction, duration: Fraction) -> int | None:
     end = start + duration
     notes = [
@@ -50,7 +42,7 @@ def _candidate_midis(
     harmonic_slice: HarmonicSlice,
     profile: InstrumentProfile,
 ) -> list[int]:
-    pitch_classes = _chord_pitch_classes(harmonic_slice)
+    pitch_classes = harmonic_slice.selected.pcs
     return [
         midi for midi in range(profile.min_midi, profile.max_midi + 1)
         if midi % 12 in pitch_classes

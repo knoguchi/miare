@@ -126,6 +126,11 @@ class HarmonyCandidate:
     root_pc: int
     quality: str
     score: float
+    # The chord's own pitch classes, as the harmonic vocabulary built them.
+    # `quality` names the triad type for reporting; it is too coarse to rebuild
+    # this set from, so every consumer reads this field instead of expanding
+    # `root_pc` + `quality` itself.
+    pcs: frozenset[int] = field(kw_only=True)
     reasons: list[str] = field(default_factory=list)
 
 
@@ -227,4 +232,7 @@ def to_jsonable(value: Any) -> Any:
         return {key: to_jsonable(item) for key, item in value.items()}
     if isinstance(value, (list, tuple)):
         return [to_jsonable(item) for item in value]
+    if isinstance(value, (set, frozenset)):
+        # Sorted, so the on-disk sidecar stays byte-identical between runs.
+        return sorted(to_jsonable(item) for item in value)
     return value

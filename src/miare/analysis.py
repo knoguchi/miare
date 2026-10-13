@@ -252,13 +252,6 @@ def _chord_vocabulary(tonic_pc: int, mode: str) -> list[tuple[int, set[int], str
     return chords
 
 
-def _pcs_from_candidate(candidate: HarmonyCandidate) -> set[int]:
-    root = candidate.root_pc
-    third = 4 if candidate.quality == "major" else 3
-    fifth = 6 if candidate.quality == "diminished" else 7
-    return {root, (root + third) % 12, (root + fifth) % 12}
-
-
 def _transition(left: int, right: int) -> float:
     tonic = {1, 3, 6}
     predominant = {2, 4}
@@ -359,7 +352,16 @@ def infer_harmony(
                     reasons.append("phrase-end dominant arrival")
             if any(event.pitch.midi % 12 == root_pc for event in notes):
                 reasons.append("root present in melody")
-            row.append(HarmonyCandidate(degree, root_pc, quality, value, reasons))
+            row.append(
+                HarmonyCandidate(
+                    degree,
+                    root_pc,
+                    quality,
+                    value,
+                    pcs=frozenset(chord_pcs),
+                    reasons=reasons,
+                )
+            )
             row_scores.append(value)
         candidate_rows.append(row)
         local_scores.append(row_scores)
@@ -502,9 +504,9 @@ def extract_musical_language(
         if count >= 2
     ]
 
-    chord_tones: dict[str, set[int]] = {}
+    chord_tones: dict[str, frozenset[int]] = {}
     for harmonic_slice in harmony:
-        chord_tones[harmonic_slice.id] = _pcs_from_candidate(harmonic_slice.selected)
+        chord_tones[harmonic_slice.id] = harmonic_slice.selected.pcs
     non_chord = 0
     considered = 0
     for event in melody:
@@ -608,12 +610,9 @@ def reduce_to_structural_melody(
             ),
             None,
         )
-        chord_pcs = set()
+        chord_pcs: frozenset[int] = frozenset()
         if harmonic is not None:
-            root = harmonic.selected.root_pc
-            third = 4 if harmonic.selected.quality == "major" else 3
-            fifth = 6 if harmonic.selected.quality == "diminished" else 7
-            chord_pcs = {root, (root + third) % 12, (root + fifth) % 12}
+            chord_pcs = harmonic.selected.pcs
         is_neighbor = (
             previous.pitch.midi == following.pitch.midi
             and event.pitch.midi != previous.pitch.midi
