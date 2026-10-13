@@ -123,6 +123,153 @@ class SlotContext:
     motif_intervals: frozenset[int]
 
 
+@dataclass(frozen=True)
+class CandidateContext:
+    """Per-candidate values derived from the slot, the beam state and the
+    candidate pitch. The hard-constraint gate and the scorer both read them,
+    so neither recomputes an interval or a motion the other already has.
+
+    `interval_class` and `consonant` are None/True when the slot has no melody
+    anchor: nothing sounds against the candidate, so no interval exists.
+    """
+
+    interval_class: int | None
+    consonant: bool
+    strong: bool
+    motion: int
+    spacing: int | None
+
+    @classmethod
+    def build(
+        cls,
+        slot: CounterpointSlot,
+        state: BeamState,
+        midi: int | None,
+        context: SlotContext,
+    ) -> CandidateContext:
+        melody = context.melody_midi
+        sounding = midi is not None and melody is not None
+        interval_class = (melody - midi) % 12 if sounding else None
+        previous = state.previous_midi
+        return cls(
+            interval_class=interval_class,
+            consonant=(
+                interval_class in CONSONANT_INTERVAL_CLASSES
+                if interval_class is not None
+                else True
+            ),
+            strong=slot.metric_strength >= 0.7,
+            motion=midi - previous if midi is not None and previous is not None else 0,
+            spacing=melody - midi if sounding else None,
+        )
+
+
+@dataclass(frozen=True)
+class Rejection:
+    """Why a candidate pitch may not be used at all. `rule` is one of
+    HARD_CONSTRAINT_RULES.
+
+    A rejection is not a score of -inf: DESIGN.md §3.5 keeps constraint
+    violations out of the output entirely and leaves preferences to the score.
+    """
+
+    rule: str
+
+
+# One id per hard rule, in the order the gate checks them. These were eleven
+# bare `return None` statements inside the scorer before this gate existed.
+HARD_CONSTRAINT_RULES: tuple[str, ...] = (
+    "rest-owes-resolution",
+    "non-tonal-pitch",
+    "resolution-not-consonant-step",
+    "resolution-must-fall",
+    "resolution-must-rise",
+    "unprepared-strong-dissonance",
+    "unapproached-weak-dissonance",
+    "protected-strong-dissonance",
+    "leap-over-octave",
+    "parallel-perfects",
+    "protected-voice-crossing",
+)
+
+
+def check_hard_constraints(
+    profile: InstrumentProfile,
+    slot: CounterpointSlot,
+    state: BeamState,
+    midi: int | None,
+    context: SlotContext,
+    candidate: CandidateContext,
+) -> Rejection | None:
+    """Return the first rule a candidate breaks, or None when it is usable.
+
+    Pure: no scoring, no RNG, no state mutation. DESIGN.md §9.5 runs this as
+    step 3, before the critics of step 4 ever see the candidate.
+    """
+    if midi is None:
+        # A carried dissonance must resolve onto a pitch, and a cadence slot
+        # needs a sounding note; a rest cannot supply either.
+        if state.pending_resolution is not None or slot.cadence:
+            return Rejection("rest-owes-resolution")
+        return None
+
+    if not context.source_pcs and midi % 12 not in context.tonal_pcs:
+        return Rejection("non-tonal-pitch")
+
+    consonant = candidate.consonant
+    strong = candidate.strong
+    motion = candidate.motion
+
+    if state.pending_resolution is not None:
+        if state.previous_midi is None or not consonant or abs(motion) > 2:
+            return Rejection("resolution-not-consonant-step")
+        if state.pending_resolution < 0 and motion >= 0:
+            return Rejection("resolution-must-fall")
+        if state.pending_resolution > 0 and motion <= 0:
+            return Rejection("resolution-must-rise")
+    elif not consonant:
+        if strong:
+            # A held consonance becoming dissonant may act as a suspension.
+            if state.previous_midi != midi:
+                return Rejection("unprepared-strong-dissonance")
+        else:
+            if state.previous_midi is None or not 0 < abs(motion) <= 2:
+                return Rejection("unapproached-weak-dissonance")
+
+    if slot.identity_policy == "protected" and strong and not consonant:
+        return Rejection("protected-strong-dissonance")
+
+    if state.previous_midi is not None and abs(motion) > 12:
+        return Rejection("leap-over-octave")
+
+    if (
+        context.melody_midi is not None
+        and state.previous_melody is not None
+        and state.previous_midi is not None
+    ):
+        melody_motion = context.melody_midi - state.previous_melody
+        if (
+            state.previous_interval_class in PERFECT_INTERVAL_CLASSES
+            and candidate.interval_class in PERFECT_INTERVAL_CLASSES
+            and melody_motion * motion > 0
+        ):
+            return Rejection("parallel-perfects")
+
+    # Crossing above a protected melody is only allowed when the instrument
+    # floor leaves the counterline nowhere below to go. `midi >= melody_midi`
+    # means spacing <= 0, so the scorer's `3 <= spacing <= 19` arm cannot also
+    # be true — this is the same branch it guarded.
+    if (
+        context.melody_midi is not None
+        and slot.identity_policy == "protected"
+        and midi >= context.melody_midi
+        and context.melody_midi - profile.min_midi >= 3
+    ):
+        return Rejection("protected-voice-crossing")
+
+    return None
+
+
 def _measure_at(score: SourceScore, time: Fraction):
     for measure in score.measures:
         if measure.start <= time < measure.end:
@@ -526,8 +673,14 @@ def _score_action(
     state: BeamState,
     midi: int | None,
     context: SlotContext,
+    candidate: CandidateContext,
     rng: Random,
-) -> tuple[CounterpointAction, BeamState] | None:
+) -> tuple[CounterpointAction, BeamState]:
+    """Score a candidate the hard-constraint gate has already passed.
+
+    Preference arithmetic only. Callers run `check_hard_constraints` first;
+    this function never rejects, so every candidate reaching it is playable.
+    """
     breakdown = {
         "melody": 0.0,
         "counterpoint": 0.0,
@@ -547,8 +700,6 @@ def _score_action(
     harmony_root = context.harmony_root
 
     if midi is None:
-        if state.pending_resolution is not None or slot.cadence:
-            return None
         if slot.melody_activity >= 2:
             breakdown["counterpoint"] += 0.8
             reasons.append("rests under active primary melody")
@@ -578,54 +729,28 @@ def _score_action(
             rest_run=state.rest_run + 1,
         )
 
-    interval_class = (
-        (melody_midi - midi) % 12 if melody_midi is not None else None
-    )
-    if not source_pcs and midi % 12 not in context.tonal_pcs:
-        return None
-    consonant = (
-        interval_class in CONSONANT_INTERVAL_CLASSES
-        if interval_class is not None
-        else True
-    )
-    strong = slot.metric_strength >= 0.7
-    motion = midi - state.previous_midi if state.previous_midi is not None else 0
+    interval_class = candidate.interval_class
+    consonant = candidate.consonant
+    strong = candidate.strong
+    motion = candidate.motion
 
     pending_resolution: int | None = None
     if state.pending_resolution is not None:
-        if state.previous_midi is None or not consonant or abs(motion) > 2:
-            return None
-        if state.pending_resolution < 0 and motion >= 0:
-            return None
-        if state.pending_resolution > 0 and motion <= 0:
-            return None
         breakdown["counterpoint"] += 2.0
         reasons.append("resolved carried dissonance obligation")
     elif not consonant:
         if strong:
-            # A held consonance becoming dissonant may act as a suspension.
-            if state.previous_midi != midi:
-                return None
+            # A held consonance becoming dissonant acts as a suspension.
             pending_resolution = -1
             breakdown["counterpoint"] += 0.5
             reasons.append("prepared suspension; downward resolution required")
         else:
-            if state.previous_midi is None or not 0 < abs(motion) <= 2:
-                return None
             pending_resolution = 1 if motion > 0 else -1
             breakdown["counterpoint"] += 0.4
             reasons.append("stepwise weak-beat dissonance; continuation required")
-    if (
-        slot.identity_policy == "protected"
-        and strong
-        and not consonant
-    ):
-        return None
 
     if state.previous_midi is not None:
         leap = abs(motion)
-        if leap > 12:
-            return None
         if leap <= 2:
             breakdown["melody"] += 1.2
             reasons.append("stepwise counterline motion")
@@ -650,25 +775,16 @@ def _score_action(
             reasons.append("oblique motion")
         elif melody_motion * motion > 0:
             breakdown["counterpoint"] -= 0.2
-        if (
-            state.previous_interval_class in PERFECT_INTERVAL_CLASSES
-            and interval_class in PERFECT_INTERVAL_CLASSES
-            and melody_motion * motion > 0
-        ):
-            return None
 
     if melody_midi is not None:
-        spacing = melody_midi - midi
+        spacing = candidate.spacing
         if 3 <= spacing <= 19:
             breakdown["counterpoint"] += 0.7
         elif midi >= melody_midi:
             breakdown["counterpoint"] -= 3.0
             reasons.append("voice-crossing penalty")
-            if (
-                slot.identity_policy == "protected"
-                and melody_midi - profile.min_midi >= 3
-            ):
-                return None
+            # The gate already rejected a crossing a protected phrase could
+            # have avoided, so any crossing left here is forced by the floor.
             breakdown["source_identity"] -= 1.2
             reasons.append("crossing unavoidable near instrument floor")
         if interval_class == 0 and not slot.cadence:
@@ -880,7 +996,15 @@ def generate_counterpoint_candidates(
             for state in states:
                 candidates = _candidate_pitches(profile, slot, state, context)
                 for midi in candidates:
-                    scored = _score_action(
+                    candidate = CandidateContext.build(
+                        slot, state, midi, context
+                    )
+                    rejection = check_hard_constraints(
+                        profile, slot, state, midi, context, candidate
+                    )
+                    if rejection is not None:
+                        continue
+                    _, new_state = _score_action(
                         song,
                         profile,
                         config,
@@ -888,11 +1012,10 @@ def generate_counterpoint_candidates(
                         state,
                         midi,
                         context,
+                        candidate,
                         rng,
                     )
-                    if scored is not None:
-                        _, new_state = scored
-                        expanded_states.append(new_state)
+                    expanded_states.append(new_state)
             return expanded_states
 
         expanded = expand(beam)
