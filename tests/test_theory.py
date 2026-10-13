@@ -10,6 +10,7 @@ These tests verify the analysis layer against textbook rules:
 """
 from __future__ import annotations
 
+import json
 from fractions import Fraction
 from pathlib import Path
 
@@ -32,6 +33,7 @@ from miare.ir import (
     Phrase,
     Pitch,
     SourceScore,
+    to_jsonable,
 )
 from miare.musicxml import parse_musicxml
 
@@ -505,3 +507,69 @@ class TestConsumersShareOneChordSet:
             midis = _candidate_midis(harmonic_slice, profile)
             assert midis, "profile must admit at least one chord tone"
             assert {midi % 12 for midi in midis} == set(harmonic_slice.selected.pcs)
+
+
+class TestChordPitchClassesSurviveSerialisation:
+    """`pcs` is a frozenset, which `json.dumps` cannot write.
+
+    `to_jsonable` is the only thing standing between the new field and a
+    `TypeError` on every `miare arrange --report`, and sorting is what keeps
+    the sidecar byte-identical between runs of the same seed.
+    """
+
+    def test_to_jsonable_writes_a_set_as_a_sorted_list(self) -> None:
+        assert to_jsonable(frozenset({7, 0, 4})) == [0, 4, 7]
+        assert to_jsonable({7, 0, 4}) == [0, 4, 7]
+
+    def test_candidate_pcs_round_trip_through_json(self) -> None:
+        source = parse_musicxml(FIXTURE)
+        song = analyze_score(source)
+        candidate = song.harmony[0].selected
+        payload = json.loads(json.dumps(to_jsonable(candidate)))
+        assert payload["pcs"] == sorted(candidate.pcs)
+
+
+class TestEveryQualityCarriesItsOwnSet:
+    """The field has to hold the vocabulary's set for every chord the
+    vocabulary can build, not only the three the fixture happens to select.
+
+    This is the defect the ticket names: a quality whose triad is not one of
+    the three hard-coded shapes used to fall through `else 3` / `else 7` and
+    be scored as a minor triad with no error. Checked across all 12 tonics and
+    both modes so a new vocabulary entry cannot reintroduce it quietly.
+    """
+
+    def test_vocabulary_sets_are_self_consistent(self) -> None:
+        for tonic_pc in range(12):
+            for mode in ("major", "minor"):
+                for root_pc, pcs, quality in _chord_vocabulary(tonic_pc, mode):
+                    assert root_pc in pcs
+                    assert len(pcs) == 3
+                    offsets = sorted((pc - root_pc) % 12 for pc in pcs)
+                    expected = {
+                        "major": [0, 4, 7],
+                        "minor": [0, 3, 7],
+                        "diminished": [0, 3, 6],
+                    }[quality]
+                    assert offsets == expected
+
+    def test_candidates_cover_every_vocabulary_degree(self) -> None:
+        # Each slice offers one candidate per vocabulary entry, each carrying
+        # that entry's own set — including the chromatic degrees 8-9 that the
+        # fixture never selects.
+        source = parse_musicxml(FIXTURE)
+        song = analyze_score(source)
+        vocab = _chord_vocabulary(song.tonic_pc, song.mode)
+        for harmonic_slice in song.harmony:
+            assert len(harmonic_slice.candidates) == len(vocab)
+            built = {c.degree: c.pcs for c in harmonic_slice.candidates}
+            for degree, (_, pcs, _) in enumerate(vocab, 1):
+                assert built[degree] == frozenset(pcs)
+
+    def test_pcs_is_required_and_keyword_only(self) -> None:
+        # No default: a candidate cannot be built without naming its set, so a
+        # new construction site cannot silently inherit a wrong one.
+        with pytest.raises(TypeError):
+            HarmonyCandidate(1, 0, "major", 0.0)  # type: ignore[call-arg]
+        with pytest.raises(TypeError):
+            HarmonyCandidate(1, 0, "major", 0.0, frozenset({0, 4, 7}))  # type: ignore[misc]
