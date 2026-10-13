@@ -225,7 +225,21 @@ __marimo__/
 /*.musicxml
 !tests/fixtures/*.musicxml
 
-# super-board local state (worktrees and the per-machine active pointer)
+# super-board. The pack itself (.claude/bin, skills, hooks, workflows) is
+# installer output — reinstalled per-machine with the pack's ./install.sh —
+# so only this project's config is committed, per the onboard spec.
+.claude/bin/
+.claude/hooks/
+.claude/skills/
+.claude/workflows/
+.claude/settings.json
+.claude/settings.json.bak-*
 .claude/worktrees/
 .claude/super-board/active
 .claude/super-board/inflight/
+.claude/super-board/onboard-answers.json
+.claude/super-board/onboard-staged/
+.claude/super-board/backup/
+.claude/super-board/migrations/
+.claude/super-board/upgrade.json
+skills-lock.json

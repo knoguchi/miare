@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "description": "miare build board",
+  "project": {
+    "owner": "knoguchi",
+    "title": "Miare board",
+    "number": 3
+  },
+  "worker_backend": "workflow",
+  "model_tier": "medium",
+  "target": {
+    "type": "repo",
+    "url": null
+  },
+  "repo": {
+    "path": ".",
+    "remote": "https://github.com/knoguchi/miare"
+  },
+  "base_branch": "staging",
+  "timezone": "America/Los_Angeles",
+  "columns": ["Backlog", "Ready", "Building", "QA", "Review", "Blocked", "Done"],
+  "labels": ["qa", "bug", "feature"],
+  "paths": {
+    "project_md": "docs/super-board/PROJECT.md",
+    "pre_flight_md": "docs/super-board/pre-flight.md",
+    "runs_dir": "docs/super-board/runs"
+  },
+  "human_approves_merge": false,
+  "merge_policy": {
+    "default": "auto",
+    "auto_max_lines": 400,
+    "always_human": {
+      "money": {
+        "labels": ["money", "payments", "billing", "pricing"],
+        "paths": ["**/billing/**", "**/payments/**", "**/stripe/**", "**/checkout/**"],
+        "keywords": ["stripe.", "payment_intent", "price_id", "invoice.create"]
+      },
+      "auth": {
+        "labels": ["auth", "security"],
+        "paths": ["**/auth/**", "**/authz/**", "**/permissions/**"],
+        "keywords": ["jwt.sign", "bcrypt", "password_hash", "service_role"]
+      },
+      "schema": {
+        "labels": ["schema", "destructive"],
+        "paths": [],
+        "keywords": ["drop table", "drop column", "truncate table", "rename column", "drop schema"]
+      }
+    },
+    "allow_auto_on_production": false
+  },
+  "migrations": {
+    "globs": ["supabase/migrations/**", "prisma/migrations/**", "drizzle/**", "**/migrations/*.sql", "db/migrate/**", "alembic/versions/**"],
+    "allowed_envs": [],
+    "target_env": "staging",
+    "commands": {},
+    "checks": {},
+    "human_steps": []
+  },
+  "no_progress_cycles": 6,
+  "max_dispatches": 0,
+  "truth_gate": "non-trivial",
+  "truth_threshold": 70,
+  "verify_commands": [
+    "uv sync --quiet && uv run pytest -q"
+  ],
+  "usage_pause_pct": 95,
+  "usage_fallback": "none",
+  "max_workers": 2,
+  "rebuild_cap": 2,
+  "block_rate_alert_pct": 30,
+  "collect": {
+    "sources": ["github", "prs", "architecture"],
+    "window_days": 14,
+    "prs": {
+      "max_prs": 200
+    },
+    "architecture": {
+      "max_findings": 5
+    },
+    "custom": []
+  },
+  "notifications": {
+    "channel": "session",
+    "chat_id": null,
+    "bot_identity": "knoguchi"
+  }
+}
