@@ -350,7 +350,9 @@ def _source_context(
     )
 
 
-def _harmony_context(song: SongIR, time: Fraction) -> tuple[set[int], int | None]:
+def _harmony_context(
+    song: SongIR, time: Fraction
+) -> tuple[frozenset[int], int | None]:
     harmonic_slice = next(
         (
             item for item in song.harmony
@@ -359,11 +361,8 @@ def _harmony_context(song: SongIR, time: Fraction) -> tuple[set[int], int | None
         None,
     )
     if harmonic_slice is None:
-        return set(), None
-    root = harmonic_slice.selected.root_pc
-    third = 4 if harmonic_slice.selected.quality == "major" else 3
-    fifth = 6 if harmonic_slice.selected.quality == "diminished" else 7
-    return {root, (root + third) % 12, (root + fifth) % 12}, root
+        return frozenset(), None
+    return harmonic_slice.selected.pcs, harmonic_slice.selected.root_pc
 
 
 def _tonal_pitch_classes(song: SongIR) -> set[int]:

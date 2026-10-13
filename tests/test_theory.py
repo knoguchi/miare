@@ -22,7 +22,17 @@ from miare.analysis import (
     reduce_to_structural_melody,
     tonic_from_signature,
 )
-from miare.ir import Event, Measure, Phrase, Pitch, SourceScore
+from miare.counterpoint import _harmony_context
+from miare.generation import _candidate_midis
+from miare.instruments import get_profile
+from miare.ir import (
+    Event,
+    HarmonyCandidate,
+    Measure,
+    Phrase,
+    Pitch,
+    SourceScore,
+)
 from miare.musicxml import parse_musicxml
 
 
@@ -416,3 +426,82 @@ class TestMinorKeyAnalysis:
         minor_pcs = {9, 11, 0, 2, 4, 5, 7}
         melody_pcs = {ev.pitch.midi % 12 for ev in song.melody if ev.pitch}
         assert melody_pcs <= minor_pcs
+
+
+# ---------------------------------------------------------------------------
+# Chord pitch classes carried on HarmonyCandidate
+# ---------------------------------------------------------------------------
+
+class TestCandidateChordPitchClasses:
+    """A candidate carries the chord it names, so no consumer re-derives it.
+
+    The triad qualities are checked against the C-major vocabulary, where the
+    three triad types all occur: I is major, ii is minor, vii is diminished.
+    """
+
+    def _candidates(self) -> list[HarmonyCandidate]:
+        source = parse_musicxml(FIXTURE)
+        song = analyze_score(source)
+        return [
+            candidate
+            for harmonic_slice in song.harmony
+            for candidate in harmonic_slice.candidates
+        ]
+
+    def test_major_triad_pitch_classes(self) -> None:
+        # C major (degree 1 of C major): C E G = {0, 4, 7}
+        candidate = next(
+            c for c in self._candidates() if c.degree == 1 and c.quality == "major"
+        )
+        assert candidate.pcs == frozenset({0, 4, 7})
+
+    def test_minor_triad_pitch_classes(self) -> None:
+        # D minor (degree 2 of C major): D F A = {2, 5, 9}
+        candidate = next(
+            c for c in self._candidates() if c.degree == 2 and c.quality == "minor"
+        )
+        assert candidate.pcs == frozenset({2, 5, 9})
+
+    def test_diminished_triad_pitch_classes(self) -> None:
+        # B diminished (degree 7 of C major): B D F = {11, 2, 5}
+        candidate = next(
+            c for c in self._candidates() if c.degree == 7 and c.quality == "diminished"
+        )
+        assert candidate.pcs == frozenset({11, 2, 5})
+
+    def test_pcs_match_the_vocabulary_that_built_them(self) -> None:
+        # Every degree's pcs is the set _chord_vocabulary computed, not a
+        # re-expansion of root_pc + quality.
+        source = parse_musicxml(FIXTURE)
+        song = analyze_score(source)
+        vocab = _chord_vocabulary(song.tonic_pc, song.mode)
+        for harmonic_slice in song.harmony:
+            for candidate in harmonic_slice.candidates:
+                _, pcs, _ = vocab[candidate.degree - 1]
+                assert candidate.pcs == frozenset(pcs)
+
+
+class TestConsumersShareOneChordSet:
+    """analysis's non-chord-tone test and counterpoint's chord-tone bonus read
+    the same pitch classes for the same slice."""
+
+    def test_analysis_and_counterpoint_read_the_same_set(self) -> None:
+        source = parse_musicxml(FIXTURE)
+        song = analyze_score(source)
+        assert song.harmony, "fixture must analyse to at least one harmonic slice"
+        for harmonic_slice in song.harmony:
+            analysis_pcs = harmonic_slice.selected.pcs
+            counterpoint_pcs, root = _harmony_context(song, harmonic_slice.start)
+            assert counterpoint_pcs == analysis_pcs
+            assert root == harmonic_slice.selected.root_pc
+
+    def test_generation_reads_the_same_set(self) -> None:
+        # _candidate_midis picks output pitches by chord membership; every midi
+        # it offers must reduce to a pitch class in the candidate's own set.
+        source = parse_musicxml(FIXTURE)
+        song = analyze_score(source)
+        profile = get_profile("cello")
+        for harmonic_slice in song.harmony:
+            midis = _candidate_midis(harmonic_slice, profile)
+            assert midis, "profile must admit at least one chord tone"
+            assert {midi % 12 for midi in midis} == set(harmonic_slice.selected.pcs)
