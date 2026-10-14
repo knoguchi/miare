@@ -17,21 +17,47 @@ from .ir import (
 from .musicxml import generated_from_source
 
 
-def _melody_anchor(song: SongIR, start: Fraction, duration: Fraction) -> int | None:
-    end = start + duration
+def _planning_melody(song: SongIR) -> list:
+    """The melody the support voice is planned against.
+
+    DESIGN.md §7.7: the full melody is for notation; the structural melody is
+    the unit for role planning, counterpoint and anchors.  Scoring the support
+    voice against ornamental passing tones drags it toward surface notes and
+    over-densifies the accompaniment.  Same helper as `counterpoint.py`.
+    """
+    return song.structural_melody or song.melody
+
+
+def _melody_anchor(song: SongIR, start: Fraction, end: Fraction) -> int | None:
+    """The structural pitch governing [start, end).
+
+    Takes `(start, end)` to match `counterpoint._melody_anchor`, so a call
+    copied between the two modules cannot pick a wrong time window.
+    """
+    melody = _planning_melody(song)
     notes = [
-        event for event in song.melody
+        event for event in melody
         if event.start < end and event.end > start and event.pitch is not None
     ]
-    if not notes:
+    if notes:
+        return max(
+            notes,
+            key=lambda event: (
+                float(min(event.end, end) - max(event.start, start)),
+                -event.start,
+            ),
+        ).pitch.midi
+    # The span fell entirely inside a region the reduction pruned.  Anchor to
+    # the structural note the pruned ornament departs from, so register spacing
+    # and voice-crossing penalties still apply; returning None would disable
+    # them exactly where the surface melody is busiest.
+    previous = [
+        event for event in melody
+        if event.end <= start and event.pitch is not None
+    ]
+    if not previous:
         return None
-    return max(
-        notes,
-        key=lambda event: (
-            float(min(event.end, end) - max(event.start, start)),
-            -event.start,
-        ),
-    ).pitch.midi
+    return max(previous, key=lambda event: event.end).pitch.midi
 
 
 def _is_phrase_end(song: SongIR, end: Fraction) -> bool:
@@ -49,14 +75,8 @@ def _candidate_midis(
     ]
 
 
-def generate_support_voice(
-    song: SongIR,
-    profile: InstrumentProfile,
-    *,
-    seed: int = 1,
-    prefer_flats: bool = False,
-) -> tuple[list[GeneratedEvent], list[dict]]:
-    rng = Random(seed)
+def _support_spans(song: SongIR, profile: InstrumentProfile) -> list[dict]:
+    """The slots the Viterbi scores, each carrying its planning-melody anchor."""
     melody_start = min(event.start for event in song.melody)
     melody_end = max(event.end for event in song.melody)
     common_duration = Fraction(1)
@@ -111,11 +131,25 @@ def generate_support_voice(
                 "duration": event_duration,
                 "harmonic_slice": harmonic_slice,
                 "candidates": candidates,
-                "melody_midi": _melody_anchor(song, event_start, event_duration),
+                "melody_midi": _melody_anchor(
+                    song, event_start, event_start + event_duration
+                ),
                 "boundary_melody_midi": boundary_melody,
                 "borrowed_rhythm": borrowed_rhythm,
+                "common_duration": common_duration,
             })
+    return all_spans
 
+
+def generate_support_voice(
+    song: SongIR,
+    profile: InstrumentProfile,
+    *,
+    seed: int = 1,
+    prefer_flats: bool = False,
+) -> tuple[list[GeneratedEvent], list[dict]]:
+    rng = Random(seed)
+    all_spans = _support_spans(song, profile)
     if not all_spans:
         return [], []
 
@@ -253,7 +287,7 @@ def generate_support_voice(
             if event.start < event_end and event.end > event_start
         ]
         language_reason = (
-            f"rhythm {common_duration} borrowed from source vocabulary"
+            f"rhythm {span['common_duration']} borrowed from source vocabulary"
             if span["borrowed_rhythm"]
             else "sustained against active source rhythm"
         )
