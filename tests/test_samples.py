@@ -191,7 +191,12 @@ def _profile(arrangement: Path, index: int) -> str:
 def test_viewer_is_one_self_contained_page_at_the_repo_root() -> None:
     assert VIEWER.is_file()
     text = VIEWER.read_text(encoding="utf-8")
-    # One CDN script tag and nothing else to fetch or build: no bundler, no node_modules.
-    assert text.count("<script src=") == 1
+    # CDN script tags only — nothing to build: no bundler, no node_modules, no
+    # local vendored copies. The count is capped rather than fixed at one so a
+    # second library (the piano soundfont player) does not fail a check whose
+    # point is "no build step".
+    tags = text.count("<script src=")
+    assert 1 <= tags <= 3, f"{tags} script tags: keep the page to a few CDN deps"
+    assert "node_modules" not in text
     assert "opensheetmusicdisplay" in text
     assert "samples/" in text, "the page must list the bundled samples"
