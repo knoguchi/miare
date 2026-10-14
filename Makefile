@@ -19,9 +19,10 @@ test:  ## run the test suite
 lint:  ## ruff dead-code check over our own sources
 	uv run --with ruff ruff check src tests --select F401,F841
 
-viewer:  ## serve score_viewer.html at $(PORT) — open /score_viewer.html
-	@echo "→ http://localhost:$(PORT)/score_viewer.html   (ctrl-c to stop)"
-	@uv run python -m http.server $(PORT)
+# `miare serve`, not `python -m http.server`: it serves the same files the same way and
+# adds the analyze/arrange API, so a score dropped on the page can actually be arranged.
+viewer:  ## serve score_viewer.html + the arrange API at $(PORT)
+	@uv run miare serve --port $(PORT)
 
 # Delegates rather than repeating the commands: the script pins the seed, the beam
 # width and each sample's instrument profiles, and tests/test_samples.py regenerates

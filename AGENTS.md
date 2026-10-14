@@ -10,8 +10,9 @@ musical vocabulary and grammar as the reference. MusicXML in, two-voice score ou
 | Install deps | `uv sync` |
 | Run tests | `uv run pytest -q` |
 | Run a single test | `uv run pytest tests/test_<name>.py -q` |
-| CLI (in repo) | `PYTHONPATH=src python3 -m miare <analyze\|arrange\|inspect> …` |
+| CLI (in repo) | `PYTHONPATH=src python3 -m miare <analyze\|arrange\|inspect\|serve> …` |
 | CLI (installed) | `miare --help` |
+| Viewer + arrange API | `make viewer` (`miare serve --port 8765`) |
 
 `pyproject.toml` sets `pythonpath = ["src"]` and `testpaths = ["tests"]`, so pytest needs no
 `PYTHONPATH`. Running the module directly does.
@@ -20,7 +21,9 @@ musical vocabulary and grammar as the reference. MusicXML in, two-voice score ou
 
 | Path | Responsibility |
 |---|---|
-| `src/miare/cli.py` | argparse entry point; `analyze`, `arrange`, `inspect` subcommands |
+| `src/miare/cli.py` | argparse entry point; `analyze`, `arrange`, `inspect`, `serve` subcommands |
+| `src/miare/pipeline.py` | the analyse/arrange sequence itself, independent of where the score came from — the CLI and the server both call it, so neither becomes a second implementation |
+| `src/miare/server.py` | `miare serve` — localhost-only stdlib HTTP server: the repo statically, plus `POST /api/analyze`, `POST /api/arrange`, `GET /api/health` |
 | `src/miare/musicxml.py` | MusicXML read/write |
 | `src/miare/ir.py` | internal representation — the data model everything else passes around |
 | `src/miare/analysis.py` | melody, phrase, key, harmony candidates, `MusicalLanguage`, structural melody |
@@ -29,7 +32,7 @@ musical vocabulary and grammar as the reference. MusicXML in, two-voice score ou
 | `src/miare/instruments.py` | instrument profiles (range, idiom) |
 | `src/miare/theory.py` | music-theory facts shared by analysis and generation — measure lookup, scale intervals |
 | `src/miare/constraints.py` | voice-leading rules both generators read — hard constraints (leap limit, parallel perfects) and preference weights (contrary motion, voice crossing) |
-| `score_viewer.html` | single-file browser viewer: renders one arrangement, plays it back as MIDI synthesized from the MusicXML, and can mute down to a single part. No build step, one CDN script (OpenSheetMusicDisplay) |
+| `score_viewer.html` | single-file browser viewer: renders one arrangement, plays it back as MIDI synthesized from the MusicXML, and can mute down to a single part. Under `miare serve` a dropped score can also be arranged in place; under a static server that control is hidden. No build step, CDN scripts only |
 | `samples/<name>/` | the viewer's demo set — a committed `source.musicxml` plus the arrangements and `.miare.json` reports `scripts/make-samples.sh` writes beside it |
 | `scripts/make-samples.sh` | regenerates `samples/` from its committed sources; run it after an arranger change |
 | `tests/` | pytest suite |
