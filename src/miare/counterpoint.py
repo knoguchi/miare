@@ -6,6 +6,15 @@ from math import log1p
 from random import Random
 from typing import Any
 
+from .constraints import (
+    CONTRARY_MOTION_BONUS,
+    PERFECT_INTERVAL_CLASSES,
+    VOICE_CROSSING_PENALTY,
+    is_contrary_motion,
+    is_leap_over_octave,
+    is_parallel_perfect,
+    is_voice_crossing,
+)
 from .instruments import generated_from_source, get_profile
 from .ir import (
     ArrangementIR,
@@ -21,7 +30,6 @@ from .theory import measure_for_time, scale_intervals
 
 
 CONSONANT_INTERVAL_CLASSES = {0, 3, 4, 7, 8, 9}
-PERFECT_INTERVAL_CLASSES = {0, 7}
 
 
 # The eight critics of DESIGN.md §9.5, in the order the scorer runs them. Each
@@ -287,7 +295,7 @@ def check_hard_constraints(
     if slot.identity_policy == "protected" and strong and not consonant:
         return Rejection("protected-strong-dissonance")
 
-    if state.previous_midi is not None and abs(motion) > 12:
+    if state.previous_midi is not None and is_leap_over_octave(motion):
         return Rejection("leap-over-octave")
 
     if (
@@ -295,11 +303,11 @@ def check_hard_constraints(
         and state.previous_melody is not None
         and state.previous_midi is not None
     ):
-        melody_motion = context.melody_midi - state.previous_melody
-        if (
-            state.previous_interval_class in PERFECT_INTERVAL_CLASSES
-            and candidate.interval_class in PERFECT_INTERVAL_CLASSES
-            and melody_motion * motion > 0
+        if is_parallel_perfect(
+            previous_interval_class=state.previous_interval_class,
+            interval_class=candidate.interval_class,
+            melody_motion=context.melody_midi - state.previous_melody,
+            voice_motion=motion,
         ):
             return Rejection("parallel-perfects")
 
@@ -310,7 +318,7 @@ def check_hard_constraints(
     if (
         context.melody_midi is not None
         and slot.identity_policy == "protected"
-        and midi >= context.melody_midi
+        and is_voice_crossing(midi, context.melody_midi)
         and context.melody_midi - profile.min_midi >= 3
     ):
         return Rejection("protected-voice-crossing")
@@ -897,8 +905,8 @@ class CounterpointCritic(Critic):
             return
         melody_motion = data.context.melody_midi - state.previous_melody
         motion = data.candidate.motion
-        if melody_motion * motion < 0:
-            score.add(1.1, "contrary motion")
+        if is_contrary_motion(melody_motion, motion):
+            score.add(CONTRARY_MOTION_BONUS, "contrary motion")
         elif melody_motion == 0 or motion == 0:
             score.add(0.45, "oblique motion")
         elif melody_motion * motion > 0:
@@ -911,8 +919,8 @@ class CounterpointCritic(Critic):
         spacing = data.candidate.spacing
         if 3 <= spacing <= 19:
             score.add(0.7)
-        elif midi >= melody:
-            score.add(-3.0, "voice-crossing penalty")
+        elif is_voice_crossing(midi, melody):
+            score.add(VOICE_CROSSING_PENALTY, "voice-crossing penalty")
         if data.candidate.interval_class == 0 and not data.slot.cadence:
             score.add(-1.4)
         if data.candidate.strong and data.candidate.consonant:

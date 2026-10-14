@@ -3,6 +3,14 @@ from __future__ import annotations
 from fractions import Fraction
 from random import Random
 
+from .constraints import (
+    CONTRARY_MOTION_BONUS,
+    VOICE_CROSSING_PENALTY,
+    is_contrary_motion,
+    is_leap_over_octave,
+    is_parallel_perfect,
+    is_voice_crossing,
+)
 from .instruments import generated_from_source, get_profile
 from .ir import (
     ArrangementIR,
@@ -163,8 +171,8 @@ def generate_support_voice(
             value -= 2.0
         melody_midi = span["melody_midi"]
         if melody_midi is not None:
-            if midi >= melody_midi:
-                value -= 5.0
+            if is_voice_crossing(midi, melody_midi):
+                value += VOICE_CROSSING_PENALTY
             spacing = melody_midi - midi
             if 5 <= spacing <= 19:
                 value += 1.0
@@ -192,25 +200,34 @@ def generate_support_voice(
             return 0.0, [], ic
         reasons: list[str] = []
         value = 0.0
-        leap = abs(midi - prev_midi)
+        motion = midi - prev_midi
+        leap = abs(motion)
+        # A constraint, not a preference (DESIGN.md §3.5): the DP gate at
+        # `if best_score > NEG_INF` drops the transition, the same way
+        # `counterpoint.check_hard_constraints` rejects the candidate.
+        if is_leap_over_octave(motion):
+            ic = (melody_midi - midi) % 12 if melody_midi is not None else None
+            return float("-inf"), ["leap over an octave — hard banned"], ic
         value -= leap * 0.28
         if leap <= 5:
             value += 1.4
             reasons.append("smooth support-line motion")
-        elif leap > 12:
-            value -= 4.0
         if midi == prev_midi and is_sub:
             value -= 2.5
         if melody_midi is not None and prev_melody is not None:
             melody_dir = melody_midi - prev_melody
-            support_dir = midi - prev_midi
-            if melody_dir * support_dir < 0:
-                value += 1.2
+            if is_contrary_motion(melody_dir, motion):
+                value += CONTRARY_MOTION_BONUS
                 reasons.append("contrary motion")
-            elif melody_dir * support_dir > 0:
+            elif melody_dir * motion > 0:
                 value -= 0.25
             ic = (melody_midi - midi) % 12
-            if prev_ic in {0, 7} and ic in {0, 7} and melody_dir * (midi - prev_midi) > 0:
+            if is_parallel_perfect(
+                previous_interval_class=prev_ic,
+                interval_class=ic,
+                melody_motion=melody_dir,
+                voice_motion=motion,
+            ):
                 return float("-inf"), ["parallel perfect — hard banned"], ic
         else:
             ic = (melody_midi - midi) % 12 if melody_midi is not None else None

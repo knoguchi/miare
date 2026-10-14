@@ -1,15 +1,21 @@
 """
 Voice leading rule tests grounded in species counterpoint and SATB pedagogy.
 
-Hard rules tested here (`check_hard_constraints` rejects a violation before
-any scoring runs, so they are provably never generated):
-  - No parallel perfect intervals (5ths or octaves) in countermelody
+Both generators read their rules from `miare.constraints`; the rules
+themselves are unit-tested in `tests/test_constraints.py`.  These tests check
+the arrangements the two searches actually produce.
+
+Hard rules tested here are provably never generated — the countermelody beam
+drops a violation in `check_hard_constraints` before scoring, and the support
+Viterbi scores one `float("-inf")` so its own DP gate prunes the transition:
+  - No parallel perfect intervals (5ths or octaves) in either voice
   - No oblique-motion unison to unison at cadence in countermelody
-  - Countermelody stays below primary melody (voice crossing penalty is hard
-    in protected phrases)
+  - No leap wider than an octave in either voice
+  - Countermelody stays below primary melody (voice crossing is hard in
+    protected phrases)
 
 Soft but statistically reliable rules (verified on fixed seeds):
-  - Support voice generally stays below melody (large penalty, not hard ban)
+  - Support voice generally stays below melody (penalty, not hard ban)
   - Cadential support note lands on harmonic root (bonus ensures it on simple input)
   - Register separation: voices stay a 3rd or more apart most of the time
 
@@ -187,9 +193,10 @@ def _get_support(seed: int = 7) -> tuple:
 
 
 class TestSupportVoiceRules:
-    """Support voice tests.  Voice crossing is heavily penalized (-5 emission
-    penalty) and register separation is rewarded, so these hold on the
-    simple_melody fixture for any reasonable seed."""
+    """Support voice tests.  Voice crossing is penalized
+    (`constraints.VOICE_CROSSING_PENALTY`, applied in `_emit`) and register
+    separation is rewarded, so these hold on the simple_melody fixture for any
+    reasonable seed."""
 
     def test_support_voice_mostly_below_melody(self) -> None:
         _, _, melody, support = _get_support()
@@ -200,14 +207,17 @@ class TestSupportVoiceRules:
         )
 
     def test_no_parallel_perfect_intervals_support(self) -> None:
-        # The support DP applies a heavy -4 penalty for parallel perfects, but it
-        # is not a hard ban (unlike the countermelody scorer).  On simple input
-        # it should produce none.  If this fails, the generator needs a hard gate.
+        # Hard-banned, like the countermelody gate: `_transit` returns
+        # `float("-inf")` and the support DP's own gate
+        # (`if best_score > NEG_INF`) drops the transition, so no path through
+        # the Viterbi can contain one.  `constraints.is_parallel_perfect` is
+        # the one definition both generators read.
         _, _, melody, support = _get_support()
         violations = _parallel_perfect_pairs(melody, support)
         assert not violations, (
             f"Parallel perfect intervals in support at: {violations}. "
-            "The support Viterbi only penalises (−4); a hard-ban gate is missing."
+            "The support DP hard-bans these, so a hit means the -inf "
+            "transition is no longer pruned."
         )
 
     def test_register_separation_at_least_minor_third(self) -> None:
@@ -249,8 +259,20 @@ class TestSupportVoiceRules:
         errors = validate_arrangement(arrangement)
         assert not errors
 
+    def test_support_leap_never_exceeds_octave(self) -> None:
+        # Hard-banned, the same rule the countermelody gate enforces:
+        # `_transit` returns `float("-inf")` for a leap over an octave and the
+        # support DP gate prunes the transition.  Before `constraints.py` this
+        # was a -4.0 penalty a strong emission score could outbid.
+        _, _, _, support = _get_support()
+        midis = [ev.pitch.midi for ev in sorted(support, key=lambda e: e.start)]
+        for left, right in zip(midis, midis[1:]):
+            leap = abs(right - left)
+            assert leap <= 12, f"Leap of {leap} semitones detected in support voice"
+
     def test_support_voice_prefers_contrary_motion(self) -> None:
-        # Contrary motion gets a +1.2 bonus.  Count how often it occurs.
+        # Contrary motion gets `constraints.CONTRARY_MOTION_BONUS`.  Count how
+        # often it occurs.
         _, _, melody, support = _get_support()
         pairs = _simultaneous_intervals(melody, support)
         contrary = 0
