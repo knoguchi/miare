@@ -11,12 +11,11 @@ import sys
 from typing import Any
 
 from . import __version__
-from .analysis import analyze_score
-from .counterpoint import arrange_countermelody
-from .generation import arrange_support, validate_arrangement
 from .instruments import PROFILES
-from .ir import SourceScore, to_jsonable
-from .musicxml import parse_musicxml, validate_round_trip, write_arrangement
+from .ir import to_jsonable
+from .musicxml import parse_musicxml
+from .pipeline import analyze_source, arrange_source, inspect_source
+from .server import serve
 
 
 MUSESCORE_FORMATS = frozenset({".mscz", ".mscx"})
@@ -92,128 +91,47 @@ def _as_musicxml_output(path: Path):
         _convert_via_mscore(xml_path, path)
 
 
-def _inspect(score: SourceScore) -> dict[str, Any]:
-    total_notes = sum(
-        1 for part in score.parts for event in part.events if event.pitch is not None
-    )
-    ranges = {}
-    for part in score.parts:
-        pitches = [event.pitch.midi for event in part.events if event.pitch is not None]
-        ranges[part.id] = {
-            "name": part.name,
-            "notes": len(pitches),
-            "minimum_midi": min(pitches) if pitches else None,
-            "maximum_midi": max(pitches) if pitches else None,
-            "voices": sorted({event.voice for event in part.events}),
-        }
-    return {
-        "title": score.title,
-        "parts": len(score.parts),
-        "measures": len(score.measures),
-        "notes": total_notes,
-        "duration_quarters": str(score.measures[-1].end),
-        "key_signature": {"fifths": score.fifths, "mode": score.mode},
-        "part_details": ranges,
-        "diagnostics": score.diagnostics,
-    }
-
-
 def _cmd_analyze(args: argparse.Namespace) -> int:
     with _as_musicxml_input(Path(args.input)) as xml_path:
-        score = parse_musicxml(xml_path)
-        song = analyze_score(score)
-        _dump_json(
-            {
-                "source": _inspect(score),
-                "analysis": song,
-            },
-            args.output,
-        )
+        _dump_json(analyze_source(xml_path), args.output)
     return 0
 
 
 def _cmd_arrange(args: argparse.Namespace) -> int:
-    if args.relationship not in {"support", "countermelody"}:
-        raise ValueError(
-            f"relationship {args.relationship!r} is represented by the design but not implemented; "
-            "implemented relationships are 'support' and 'countermelody'"
-        )
     output_path = Path(args.output)
     with _as_musicxml_input(Path(args.input)) as xml_input:
-        score = parse_musicxml(xml_input)
-        unsupported = [
-            diagnostic for diagnostic in score.diagnostics
-            if diagnostic.startswith("UNSUPPORTED-OUTPUT:")
-        ]
-        if unsupported and not args.allow_lossy_input:
-            raise ValueError(
-                "input contains notation that cannot yet be preserved: "
-                + "; ".join(unsupported)
-                + ". Pass --allow-lossy-input to proceed explicitly"
-            )
-        song = analyze_score(score)
-        if args.relationship == "support":
-            arrangement = arrange_support(
-                score,
-                song,
+        with _as_musicxml_output(output_path) as xml_output:
+            report = arrange_source(
+                xml_input,
+                xml_output,
+                relationship=args.relationship,
                 voice1_profile=args.voice1_profile,
                 voice2_profile=args.voice2_profile,
                 seed=args.seed,
-            )
-        else:
-            arrangement = arrange_countermelody(
-                score,
-                song,
-                voice1_profile=args.voice1_profile,
-                voice2_profile=args.voice2_profile,
                 beam_width=args.beam_width,
                 context_measures=args.context_measures,
-                seed=args.seed,
+                allow_lossy_input=args.allow_lossy_input,
+                # The report names the paths the user typed, not the temp MusicXML a
+                # .mscz conversion routes through.
+                input_label=Path(args.input),
+                output_label=output_path,
             )
-        hard_errors = validate_arrangement(arrangement)
-        if hard_errors:
-            raise ValueError(
-                "arrangement violates hard constraints: " + "; ".join(hard_errors)
-            )
-        with _as_musicxml_output(output_path) as xml_output:
-            write_arrangement(xml_output, score, arrangement)
-            round_trip_errors = validate_round_trip(
-                xml_output,
-                score.measures,
-                expected_parts=2,
-                expected_arrangement=arrangement,
-            )
-            if round_trip_errors:
-                xml_output.unlink(missing_ok=True)
-                raise ValueError(
-                    "generated MusicXML failed round-trip validation: "
-                    + "; ".join(round_trip_errors)
-                )
         report_path = args.report
         if report_path is None:
             report_path = output_path.with_suffix(".miare.json")
-        _dump_json(
-            {
-                "miare_version": __version__,
-                "input": str(Path(args.input)),
-                "output": str(output_path),
-                "seed": args.seed,
-                "source": _inspect(score),
-                "analysis": song,
-                "arrangement": arrangement,
-                "round_trip": {"valid": True, "errors": []},
-            },
-            report_path,
-        )
+        _dump_json(report, report_path)
     print(f"wrote {output_path}")
     print(f"wrote {report_path}")
     return 0
 
 
+def _cmd_serve(args: argparse.Namespace) -> int:
+    return serve(root=Path(args.root), port=args.port)
+
+
 def _cmd_inspect(args: argparse.Namespace) -> int:
     with _as_musicxml_input(Path(args.input)) as xml_path:
-        score = parse_musicxml(xml_path)
-        data = _inspect(score)
+        data = inspect_source(parse_musicxml(xml_path))
     if args.json:
         _dump_json(data, None)
     else:
@@ -288,6 +206,16 @@ def build_parser() -> argparse.ArgumentParser:
     inspect.add_argument("input")
     inspect.add_argument("--json", action="store_true")
     inspect.set_defaults(func=_cmd_inspect)
+
+    serve_parser = subparsers.add_parser(
+        "serve",
+        help="serve score_viewer.html and the analyze/arrange API on localhost",
+    )
+    serve_parser.add_argument("--port", type=int, default=8765)
+    serve_parser.add_argument(
+        "--root", default=".", help="directory served statically (default: cwd)"
+    )
+    serve_parser.set_defaults(func=_cmd_serve)
     return parser
 
 

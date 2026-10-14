@@ -42,6 +42,10 @@ label.inline { color: var(--muted); display: inline-flex; align-items: center; g
 label.inline input[type=number] { width: 4rem; font: inherit; padding: .25rem; color: var(--ink);
   background: transparent; border: 1px solid var(--rule); border-radius: 5px; }
 #status { color: var(--muted); font-size: .87rem; margin: 0; min-height: 1.2em; }
+#arrangeBar[hidden] { display: none; }
+#arrangeBar { border-top: 1px solid var(--rule); padding-top: .5rem; }
+#arrange { background: var(--pen); border-color: var(--pen); color: #fff; }
+#arrangeBar label.inline input[type=number] { width: 4.5rem; }
 main { flex: 1; min-height: 0; overflow: auto; padding: 1rem; }
 #score { background: var(--paper); color: #14211d; border-radius: 4px; padding: .6rem .8rem 1rem;
   max-width: 1400px; margin: 0 auto; min-width: 0; display: none; }
@@ -86,6 +90,17 @@ body.drop main { outline: 3px dashed var(--pen); outline-offset: -8px; }
       <input id="showHarmony" type="checkbox" checked> Harmony</label>
     <label class="inline">Tempo <input id="tempo" type="number" min="20" max="300" step="1" value="100" disabled> bpm</label>
   </div>
+  <!-- Shown only when miare serve answers /api/health, and only once a score is open:
+       under plain python -m http.server there is nothing behind it. -->
+  <div class="top" id="arrangeBar" hidden>
+    <label class="inline">Arrange as
+      <select id="relationship">
+        <option value="countermelody">countermelody</option>
+        <option value="support">support</option>
+      </select></label>
+    <label class="inline">Seed <input id="seed" type="number" min="0" step="1" value="1"></label>
+    <button id="arrange">Arrange this score</button>
+  </div>
   <div class="transport">
     <button id="play" disabled>Play</button>
     <button id="stop" disabled>Stop</button>
@@ -109,10 +124,16 @@ body.drop main { outline: 3px dashed var(--pen); outline-offset: -8px; }
     <p>Press <strong>Play</strong> (or Space). The playhead marks the measure you are in,
        and clicking a measure jumps there. The parts menu mutes down to a single part
        when you want to hear just one voice.</p>
+    <h2>Arranging a score here</h2>
+    <p>Run <code>miare serve</code> (or <code>make viewer</code>) instead, and a score you
+       drop gets an <strong>Arrange</strong> button in the header: pick support or
+       countermelody and a seed, and the real analyser and arranger run on it. Nothing is
+       written to disk.</p>
     <h2>Serving it</h2>
-    <p>Run <code>python3 -m http.server</code> in the repo root and open
-       <code>http://localhost:8000/score_viewer.html</code>. The sample menu needs the
-       server; drag-and-drop works either way.</p>
+    <p><code>miare serve</code> in the repo root, then open
+       <code>http://localhost:8765/score_viewer.html</code>. Plain
+       <code>python3 -m http.server</code> still renders and plays everything — it just
+       has no arranger behind it. Drag-and-drop works either way.</p>
   </div>
   <section id="score">
     <h2><span class="name"></span> <span class="meta"></span></h2>
@@ -147,6 +168,7 @@ const view = (() => {
     metaEl: root.querySelector('.meta'),
     osmd: null,
     name: '',
+    source: null,         // {name, text} of the last score opened as a candidate to arrange
     score: null,          // {notes, measures, divisions, tempo, quarters, partNames}
     report: null,         // parsed .miare.json
     geo: [],              // per measure: {x, w, top, bottom, anchors}
@@ -297,10 +319,14 @@ async function handleFiles(files) {
   }
 }
 
-async function loadScore(name, text) {
+/* `keepSource` is set when the text being loaded is itself an arrangement this page just
+   asked for: the score to send back to the arranger stays the one the user supplied, so
+   pressing Arrange again re-arranges the original rather than arranging the output. */
+async function loadScore(name, text, { keepSource = false } = {}) {
   const score = parseScore(text);              // parse before touching the page
   stop();
   clearScore();
+  if (!keepSource) view.source = { name, text };
   $('empty').hidden = true;
   view.root.classList.add('on');
   view.score = score;
@@ -360,6 +386,7 @@ function attachReport(text, name) {
 
 function afterLoad() {
   if (!loaded()) return;
+  showArrangeBar();
   $('tempo').value = Math.round(view.score.tempo || DEFAULT_TEMPO);
   $('play').disabled = $('stop').disabled = $('seek').disabled = $('tempo').disabled = false;
   buildTimeline();
@@ -447,6 +474,68 @@ async function openSample(value) {
     setStatus(`${dir} · ${arrangement.replace(/\.(musicxml|xml|mxl)$/i, '')}`);
   } catch (e) {
     setStatus(`Could not open ${dir}: ${e.message || e}`);
+  }
+}
+
+/* ---------- arranging through `miare serve` ----------
+   The page is static and works from file:// or any static server, where there is no
+   analyser to call. `miare serve` serves this file with
+   <meta name="miare-api" content="1"> added to the head, which is how the page knows
+   there is an API to call: under plain `python -m http.server` the tag is absent, the
+   Arrange control stays hidden, and nothing else on the page changes.
+
+   The tag rather than a fetch of /api/health, deliberately — a browser logs every failed
+   request to the console, so probing an endpoint that does not exist would print an
+   error on a page that is working exactly as intended. /api/health is still there for
+   curl and the tests; the page just does not need it. */
+
+let apiReady = false;
+
+function probeApi() {
+  apiReady = !!document.querySelector('meta[name="miare-api"]');
+  showArrangeBar();
+}
+
+/* Offered only with both halves in place: an API to call, and a score to send it. */
+function showArrangeBar() {
+  $('arrangeBar').hidden = !(apiReady && view.source);
+}
+
+/* POSTs the bytes of the score on screen and replaces it with what comes back. The
+   response carries the same report shape a committed .miare.json has, so attaching it
+   lights up the Roman numerals and phrase markers by the same path a sample does. */
+async function arrangeCurrent() {
+  if (!apiReady || !view.source) return;
+  const { name, text } = view.source;
+  const relationship = $('relationship').value;
+  const seed = parseInt($('seed').value, 10) || 0;
+  const button = $('arrange');
+  button.disabled = true;
+  setStatus(`Arranging ${name} as ${relationship} (seed ${seed})…`);
+  try {
+    const query = new URLSearchParams({ relationship, seed: String(seed), name });
+    const response = await fetch(`api/arrange?${query}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/vnd.recordare.musicxml+xml' },
+      body: text,
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) {
+      // The server answers every failure as {"error": ...}; show it as it came.
+      throw new Error(payload?.error || `HTTP ${response.status}`);
+    }
+    const arrangedName = `${name.replace(/\.(musicxml|xml|mxl)$/i, '')} · ${relationship}`;
+    await loadScore(arrangedName, payload.musicxml, { keepSource: true });
+    view.report = payload.report;
+    drawPhrases();
+    drawHarmony();
+    afterLoad();
+    setStatus(`${arrangedName} — seed ${seed}`);
+  } catch (e) {
+    setStatus(`Could not arrange ${name}: ${e.message || e}`);
+  } finally {
+    button.disabled = false;
+    showArrangeBar();
   }
 }
 
@@ -878,6 +967,7 @@ $('pick').addEventListener('change', event => {
 $('samples').addEventListener('change', event => {
   if (event.target.value) openSample(event.target.value);
 });
+$('arrange').addEventListener('click', arrangeCurrent);
 $('play').addEventListener('click', () => (playing ? pause() : play()));
 $('stop').addEventListener('click', stop);
 $('showHarmony').addEventListener('change', drawHarmony);
@@ -946,10 +1036,16 @@ window.miareViewer = {
   headLeft: () => view.head.style.left,
   phrases: () => view.phraseEls.length,
   chords: () => view.harmonyEls.length,
+  apiReady: () => apiReady,
+  arrangeOffered: () => !$('arrangeBar').hidden,
+  status: () => $('status').textContent,
+  arrange: arrangeCurrent,
+  report: () => view.report,
 };
 
 requestAnimationFrame(frame);
 listSamples();
+probeApi();
 </script>
 </body>
 </html>
