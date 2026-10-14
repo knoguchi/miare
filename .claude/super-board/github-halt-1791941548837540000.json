@@ -1,0 +1,1 @@
+{"reason": "GitHub required read failed; stopped after 3 failed attempts", "attempts": 3, "at": 1791941469, "operation": {"args": ["api", "repos/knoguchi/miare/issues/20/comments", "--paginate", "--slurp", "--jq", "[.[][] | {user: .user.login, body}]"], "kind": "json", "meta": null}}

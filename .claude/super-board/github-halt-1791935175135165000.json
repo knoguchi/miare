@@ -1,0 +1,1 @@
+{"reason": "GitHub required read failed; stopped after 3 failed attempts", "attempts": 3, "at": 1791934962, "operation": {"args": ["pr", "diff", "13", "--", "src/miare/counterpoint.py"], "kind": "json", "meta": null}}

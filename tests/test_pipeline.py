@@ -168,3 +168,63 @@ def test_register_mapping_preserves_phrase_contour() -> None:
 
     assert [event.pitch.midi for event in generated] == [66, 67]
     assert diagnostics
+
+
+# --- which notation blocks an arrangement, and which is merely ignored ---------------
+#
+# The gate exists to stop miare quietly mangling a piece. That is worth doing for
+# notation whose loss changes the music, and not worth doing for notation a two-voice
+# arrangement was never going to carry. Chord symbols and repeat barlines are the second
+# kind: the analyser infers its own harmony, and a repeat is unfolded rather than lost.
+# Gating those turned an ordinary score into a dead end for anyone without the CLI flag.
+
+
+def _with_snippet(tmp_path: Path, anchor: str, snippet: str, name: str) -> Path:
+    source = FIXTURE.read_text(encoding="utf-8").replace(anchor, snippet, 1)
+    path = tmp_path / name
+    path.write_text(source, encoding="utf-8")
+    return path
+
+
+HARMONY = (
+    "<harmony><root><root-step>C</root-step></root><kind>major</kind></harmony>\n<note>"
+)
+REPEAT = (
+    '<barline location="right"><repeat direction="backward"/></barline>\n</measure>'
+)
+
+
+def test_chord_symbols_and_repeats_do_not_block_an_arrangement(tmp_path: Path) -> None:
+    """The case a user hit: a menuet with both, refused with no way through in a browser."""
+    score = _with_snippet(tmp_path, "<note>", HARMONY, "menuet-like.musicxml")
+    score.write_text(
+        score.read_text(encoding="utf-8").replace("</measure>", REPEAT, 1),
+        encoding="utf-8",
+    )
+
+    output = tmp_path / "out.musicxml"
+    assert main(["arrange", str(score), "-o", str(output)]) == 0
+    assert output.is_file()
+
+    # Ignored, not hidden: the report still says what was dropped.
+    report = json.loads(output.with_suffix(".miare.json").read_text(encoding="utf-8"))
+    diagnostics = report["source"]["diagnostics"]
+    assert any("chord symbols are ignored" in line for line in diagnostics)
+    assert any("repeat barlines are ignored" in line for line in diagnostics)
+    assert not any(line.startswith("UNSUPPORTED-OUTPUT:") for line in diagnostics)
+
+
+def test_notation_that_loses_notes_still_blocks(tmp_path: Path) -> None:
+    """A note with no duration is skipped outright, so that one still needs saying yes to."""
+    score = _with_snippet(
+        tmp_path,
+        "<note>",
+        "<note><pitch><step>C</step><octave>4</octave></pitch></note>\n<note>",
+        "dropped.musicxml",
+    )
+    output = tmp_path / "out.musicxml"
+    try:
+        main(["arrange", str(score), "-o", str(output)])
+    except SystemExit:
+        pass                                  # argparse turns the ValueError into exit 2
+    assert not output.exists(), "a score that loses a note must not arrange silently"
