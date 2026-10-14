@@ -246,3 +246,6 @@ __marimo__/
 .claude/super-board/migrations/
 .claude/super-board/upgrade.json
 skills-lock.json
+
+# macOS
+.DS_Store

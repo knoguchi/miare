@@ -23,15 +23,11 @@ viewer:  ## serve score_viewer.html at $(PORT) — open /score_viewer.html
 	@echo "→ http://localhost:$(PORT)/score_viewer.html   (ctrl-c to stop)"
 	@uv run python -m http.server $(PORT)
 
-samples:  ## regenerate samples/ from each sample's source.musicxml
-	@for dir in samples/*/; do \
-	  name=$$(basename $$dir); \
-	  [ -f "$$dir/source.musicxml" ] || continue; \
-	  for rel in support countermelody; do \
-	    echo "  $$name · $$rel"; \
-	    uv run miare arrange "$$dir/source.musicxml" -o "$$dir/$$rel.musicxml" \
-	      --relationship $$rel --seed 1 >/dev/null; \
-	  done; \
-	done
+# Delegates rather than repeating the commands: the script pins the seed, the beam
+# width and each sample's instrument profiles, and tests/test_samples.py regenerates
+# through it to prove the committed samples are current. A second copy of those
+# flags here would drift and fail that check.
+samples:  ## regenerate samples/ (after any arranger change)
+	@./scripts/make-samples.sh
 
 .PHONY: help install test lint viewer samples
