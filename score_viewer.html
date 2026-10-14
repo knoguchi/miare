@@ -128,6 +128,7 @@ body.drop main { outline: 3px dashed var(--pen); outline-offset: -8px; }
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.9/build/opensheetmusicdisplay.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
 <script>
 'use strict';
 
@@ -636,13 +637,60 @@ function updateAudioChoices() {
   if (!two) $('audio').value = 'both';
 }
 
-function play() {
+/* Recorded piano, not a synthesized approximation: MusyngKite's acoustic grand,
+   52 sampled notes delivered as base64 audio and played by soundfont-player.
+   The samples are ~2.3 MB, fetched once on the first Play and then cached by the
+   browser. Until they arrive the page falls back to the oscillator voice below,
+   so Play never blocks and an offline machine still gets sound. */
+const PIANO_NAME = 'acoustic_grand_piano';
+const PIANO_HOST = 'https://gleitz.github.io/midi-js-soundfonts/MusyngKite/';
+let piano = null;              // the loaded instrument, or null while loading / if it failed
+
+let pianoPromise = null;
+
+/* Pull the ~2.3 MB sample bank into the browser cache as soon as the page opens.
+   Decoding it needs an AudioContext, which needs a user gesture — downloading it
+   does not. By the time anyone has picked a score and reached Play the bytes are
+   already local, so the decode is near-instant. */
+fetch(`${PIANO_HOST}${PIANO_NAME}-mp3.js`, { mode: 'cors', cache: 'force-cache' })
+  .catch(() => { /* offline: Play will report it */ });
+
+function loadPiano() {
+  if (!pianoPromise) {
+    pianoPromise = Soundfont.instrument(audio, PIANO_NAME, { soundfont: 'MusyngKite', nameToUrl:
+        (name, sf, format) => `${PIANO_HOST}${name}-${format === 'ogg' ? 'ogg' : 'mp3'}.js` })
+      .then(instrument => {
+        piano = instrument;
+        piano.out.connect(master);
+        setStatus('');
+        return instrument;
+      });
+  }
+  return pianoPromise;
+}
+
+/* Play waits for the samples rather than starting on a stand-in voice: a few
+   notes in the wrong timbre while the download lands is worse than a moment of
+   silence before the first one. */
+async function play() {
   if (!loaded().length) return;
   audio = audio || new (window.AudioContext || window.webkitAudioContext)();
   if (!master) {
     master = audio.createGain();
     master.gain.value = 0.9;
     master.connect(audio.destination);
+  }
+  if (!piano) {
+    setStatus('Loading piano…');
+    $('play').disabled = true;
+    try {
+      await loadPiano();
+    } catch {
+      setStatus('Could not load the piano samples — check the network and press Play again.');
+      $('play').disabled = false;
+      return;
+    }
+    $('play').disabled = false;
   }
   audio.resume();
   if (offset >= totalSeconds() - 0.02) offset = 0;
@@ -689,21 +737,15 @@ function seek(seconds) {
 
 /* One note: a triangle oscillator through its own envelope. No soundfont to fetch,
    so the page works offline and on first load. */
+/* Recorded piano only. `play` does not start until the samples are in, so there
+   is no stand-in voice and every note sounds the same. */
 function sound(midi, at, seconds, gain) {
-  const osc = audio.createOscillator();
-  const env = audio.createGain();
-  osc.type = 'triangle';
-  osc.frequency.value = 440 * Math.pow(2, (midi - 69) / 12);
-  const end = at + Math.max(0.05, seconds);
-  env.gain.setValueAtTime(0, at);
-  env.gain.linearRampToValueAtTime(gain, at + 0.012);
-  env.gain.setTargetAtTime(0.0001, Math.max(at + 0.02, end - 0.08), 0.05);
-  osc.connect(env).connect(master);
-  osc.start(at);
-  osc.stop(end + 0.1);
-  voices.add(osc);
+  const node = piano.play(midi, at, { duration: Math.max(0.08, seconds), gain });
+  if (node && typeof node.stop === 'function') {
+    voices.add(node);
+    if (typeof node.on === 'function') node.on('ended', () => voices.delete(node));
+  }
   notesScheduled++;
-  osc.onended = () => voices.delete(osc);
 }
 
 /* Schedule every note starting inside the next LOOKAHEAD seconds. Each run of
