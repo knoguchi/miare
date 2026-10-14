@@ -7,6 +7,8 @@ behaviour so the two callers cannot drift apart again.
 """
 from __future__ import annotations
 
+import importlib
+import inspect
 from fractions import Fraction
 from pathlib import Path
 
@@ -106,3 +108,41 @@ class TestCallersDelegate:
 
         assert not hasattr(analysis, "_measure_for_time")
         assert not hasattr(counterpoint, "_measure_at")
+
+
+class TestNoModuleKeepsItsOwnCopy:
+    """The point of `theory.py` is that exactly one copy of each rule exists.
+
+    `test_duplicated_private_helpers_are_gone` pins the two old names.  These
+    pin the *rule*, so a future copy under a third name is caught too: no
+    module may re-implement the measure lookup, and none may inline the scale
+    literals that `scale_intervals` owns.
+    """
+
+    SHARED_MODULES = ("analysis", "counterpoint")
+    LOOKUP_BODY = "if measure.start <= time < measure.end:"
+    SCALE_LITERALS = ("0, 2, 3, 5, 7, 8, 10", "0, 2, 4, 5, 7, 9, 11")
+
+    @pytest.mark.parametrize("module_name", SHARED_MODULES)
+    def test_no_module_reimplements_the_measure_lookup(self, module_name):
+        source = inspect.getsource(importlib.import_module(f"miare.{module_name}"))
+        assert self.LOOKUP_BODY not in source, (
+            f"miare.{module_name} re-implements the measure lookup; "
+            "call theory.measure_for_time instead"
+        )
+
+    @pytest.mark.parametrize("module_name", SHARED_MODULES)
+    def test_no_module_inlines_the_scale_literals(self, module_name):
+        source = inspect.getsource(importlib.import_module(f"miare.{module_name}"))
+        for literal in self.SCALE_LITERALS:
+            assert literal not in source, (
+                f"miare.{module_name} inlines the scale tuple ({literal}); "
+                "call theory.scale_intervals instead"
+            )
+
+    def test_theory_is_the_one_module_that_owns_them(self):
+        """Guard the guard: the probes must still match the real helper."""
+        source = inspect.getsource(theory)
+        assert self.LOOKUP_BODY in source
+        for literal in self.SCALE_LITERALS:
+            assert literal in source
