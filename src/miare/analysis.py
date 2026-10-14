@@ -15,6 +15,7 @@ from .ir import (
     SourceScore,
     fraction_text,
 )
+from .theory import measure_for_time, scale_intervals
 
 
 MAJOR_PROFILE = (6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88)
@@ -110,20 +111,13 @@ def select_melody(score: SourceScore) -> tuple[str, str, list[Event], list[str]]
     return part_id, voice, line, diagnostics
 
 
-def _measure_for_time(score: SourceScore, time: Fraction):
-    for measure in score.measures:
-        if measure.start <= time < measure.end:
-            return measure
-    return score.measures[-1]
-
-
 def detect_phrases(score: SourceScore, melody: list[Event], tonic_pc: int) -> list[Phrase]:
     if not melody:
         return []
     boundary_events: list[tuple[Fraction, list[str]]] = []
     for index, event in enumerate(melody[:-1]):
         following = melody[index + 1]
-        measure = _measure_for_time(score, event.start)
+        measure = measure_for_time(score, event.start)
         beat = Fraction(4, measure.beat_type)
         gap = following.start - event.end
         evidence: list[str] = []
@@ -219,7 +213,7 @@ def detect_phrases(score: SourceScore, melody: list[Event], tonic_pc: int) -> li
 
 
 def _scale(mode: str) -> tuple[int, ...]:
-    return (0, 2, 3, 5, 7, 8, 10) if mode.startswith("min") else (0, 2, 4, 5, 7, 9, 11)
+    return scale_intervals(mode)
 
 
 def _chord_vocabulary(tonic_pc: int, mode: str) -> list[tuple[int, set[int], str]]:
@@ -325,7 +319,7 @@ def infer_harmony(
                     value -= 2.0
             for event in notes:
                 overlap = min(event.end, end) - max(event.start, start)
-                measure = _measure_for_time(score, event.start)
+                measure = measure_for_time(score, event.start)
                 local_onset = event.start - measure.start
                 metric_weight = 1.8 if local_onset == 0 else 1.2
                 if event.pitch.midi % 12 in chord_pcs:
@@ -488,7 +482,7 @@ def extract_musical_language(
     rhythms = Counter(fraction_text(event.duration) for event in melody)
     accents: Counter[str] = Counter()
     for event in melody:
-        measure = _measure_for_time(score, event.start)
+        measure = measure_for_time(score, event.start)
         beat = Fraction(4, measure.beat_type)
         position = (event.start - measure.start) / beat
         accents[f"beat-{fraction_text(position + 1)}"] += 1
@@ -599,7 +593,7 @@ def reduce_to_structural_melody(
             continue
         previous = melody[index - 1]
         following = melody[index + 1]
-        measure = _measure_for_time(score, event.start)
+        measure = measure_for_time(score, event.start)
         beat = Fraction(4, measure.beat_type)
         local_position = event.start - measure.start
         strong = local_position % beat == 0

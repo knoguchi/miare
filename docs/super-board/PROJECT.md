@@ -44,6 +44,7 @@ All source is in `src/miare/` (flat package, no sub-packages).
 | `generation.py` | `relationship="support"`: `generate_support_voice` scores candidate pitches per harmonic slice; `validate_arrangement` enforces hard constraints (range, positive duration, monophony); entry point `arrange_support`. |
 | `counterpoint.py` | `relationship="countermelody"`: beam search over `CounterpointSlot`s. `build_counterpoint_plan` → `CounterpointPlan` (spans with `identity_policy`, texture, motif signature); `_score_action` holds the critic weights and the hard rules; `generate_counterpoint_candidates` runs the beam; entry point `arrange_countermelody`. Largest module (~1050 lines). |
 | `instruments.py` | `PROFILES` dict (violin, viola, cello, flute, bassoon) + `get_profile`. Ranges, preferred ranges, clef. `generated_from_source` maps source notes into an instrument's register (phrase-coherent octave displacement, Viterbi). |
+| `theory.py` | Music-theory facts both `analysis.py` and `counterpoint.py` need, one copy each: `measure_for_time` (the measure whose half-open span holds a time) and `scale_intervals` (semitone offsets above the tonic). Pure; imports only `ir`. Voice-leading rules are not here — those belong in `constraints.py`. |
 | `cli.py` | argparse front end: `analyze`, `arrange`, `inspect`. Also owns MuseScore `.mscz`/`.mscx` conversion shims and the JSON report writer. |
 | `__main__.py` | `python3 -m miare` shim. |
 
