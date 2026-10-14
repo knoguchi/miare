@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>miare score viewer</title>
+<style>
+:root {
+  --desk: #e4e7ea; --bar: #f6f8f9; --ink: #16201f; --muted: #5a6b68;
+  --rule: #c4cdcf; --pen: #1f4fd1; --marker: rgba(255, 214, 51, .40);
+  --phrase: rgba(31, 79, 209, .30); --paper: #ffffff;
+  box-sizing: border-box;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --desk: #171f1e; --bar: #212b2a; --ink: #e9eeed; --muted: #9aaaa7; --rule: #37443f; }
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { height: 100%; }
+body {
+  height: 100%; margin: 0; display: flex; flex-direction: column;
+  background: var(--desk); color: var(--ink);
+  font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+header {
+  background: var(--bar); border-bottom: 1px solid var(--rule);
+  padding: .6rem 1rem .7rem; display: grid; gap: .55rem;
+}
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .9rem; }
+h1 { font: 500 1.2rem/1 Georgia, serif; margin: 0 .4rem 0 0; }
+button, select, .open { font: inherit; color: var(--ink); background: transparent; cursor: pointer;
+  border: 1px solid var(--rule); border-radius: 6px; padding: .35rem .7rem; }
+button:disabled { opacity: .45; cursor: default; }
+button:focus-visible, select:focus-visible, .open:focus-within, input:focus-visible {
+  outline: 2px solid var(--pen); outline-offset: 2px; }
+.open input[type=file] { position: absolute; opacity: 0; width: 1px; height: 1px; }
+#play { min-width: 4.4rem; background: var(--pen); border-color: var(--pen); color: #fff; }
+.transport { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem .8rem; }
+#seek { flex: 1; min-width: 8rem; accent-color: var(--pen); }
+#clock, #bar { font-variant-numeric: tabular-nums; white-space: nowrap; }
+#bar { color: var(--muted); min-width: 5.5rem; }
+label.inline { color: var(--muted); display: inline-flex; align-items: center; gap: .3rem; }
+label.inline input[type=number] { width: 4rem; font: inherit; padding: .25rem; color: var(--ink);
+  background: transparent; border: 1px solid var(--rule); border-radius: 5px; }
+#status { color: var(--muted); font-size: .87rem; margin: 0; min-height: 1.2em; }
+main { flex: 1; min-height: 0; overflow: auto; padding: 1rem; }
+#decks { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 1rem;
+  max-width: 2000px; margin: 0 auto; }
+.deck { background: var(--paper); color: #14211d; border-radius: 4px; padding: .6rem .8rem 1rem;
+  min-width: 0; display: none; }
+.deck.on { display: block; }
+.deck h2 { font: 600 .9rem/1.3 system-ui, sans-serif; margin: 0 0 .5rem; color: #44544f;
+  display: flex; flex-wrap: wrap; gap: .2rem .6rem; align-items: baseline; }
+.deck h2 .meta { font-weight: 400; color: #76857f; }
+.stage { position: relative; }
+.mark, .head { position: absolute; pointer-events: none; display: none; }
+.mark { background: var(--marker); border-radius: 3px; mix-blend-mode: multiply; }
+.head { width: 2px; background: #1f4fd1; margin-left: -1px; }
+.phrase { position: absolute; pointer-events: none; border-left: 2px dashed var(--phrase);
+  display: none; }
+.phrase span { position: absolute; bottom: -.15rem; left: .2rem; font: 600 10px/1 system-ui, sans-serif;
+  color: #1f4fd1; white-space: nowrap; background: rgba(255,255,255,.82); padding: 0 .1rem; }
+#empty { max-width: 42rem; margin: 2rem auto; background: var(--paper); color: #28352f;
+  border-radius: 4px; padding: 1.2rem 1.4rem; }
+#empty h2 { font: 600 1rem/1.3 system-ui, sans-serif; margin: 1rem 0 .4rem; }
+#empty h2:first-child { margin-top: 0; }
+#empty p, #empty li { margin: .3rem 0; }
+#empty code { background: #e9edec; padding: .1rem .3rem; border-radius: 3px; }
+#diag { max-width: 2000px; margin: 1rem auto 0; color: var(--muted); font-size: .85rem; }
+#diag ul { margin: .2rem 0 .6rem; padding-left: 1.2rem; }
+body.drop main { outline: 3px dashed var(--pen); outline-offset: -8px; }
+@media (max-width: 880px) { #decks { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1>miare</h1>
+    <select id="samples" title="Samples served from samples/"><option value="">Samples…</option></select>
+    <label class="open">Open files<input id="pick" type="file" multiple
+      accept=".musicxml,.xml,.mxl,.json"></label>
+    <select id="audio" title="Which score you hear" disabled>
+      <option value="both">Hear both</option>
+      <option value="a">Hear left only</option>
+      <option value="b">Hear right only</option>
+    </select>
+    <label class="inline">Tempo <input id="tempo" type="number" min="20" max="300" step="1" value="100" disabled> bpm</label>
+  </div>
+  <div class="transport">
+    <button id="play" disabled>Play</button>
+    <button id="stop" disabled>Stop</button>
+    <span id="clock">0:00 / 0:00</span>
+    <input id="seek" type="range" min="0" max="1" step="0.01" value="0" disabled aria-label="Position in the score">
+    <span id="bar"></span>
+  </div>
+  <p id="status" role="status"></p>
+</header>
+<main>
+  <div id="empty">
+    <h2>Render and play back a miare arrangement</h2>
+    <p>Pick a sample from the menu above — that is one click, nothing to choose on disk.</p>
+    <h2>Or drop your own files here</h2>
+    <ul>
+      <li>a <code>.musicxml</code> score — the source, the arrangement, or both</li>
+      <li>its <code>.miare.json</code> report, to mark phrase boundaries and show diagnostics</li>
+    </ul>
+    <p>Two scores open side by side: the first on the left, the second on the right.
+       Drop a third and it replaces the right-hand one.</p>
+    <h2>Then</h2>
+    <p>Press <strong>Play</strong> (or Space). One transport drives both scores, and the
+       playhead marks the measure each is in. Click a measure to jump there.
+       <em>Hear both / left / right</em> switches which score sounds.</p>
+    <h2>Serving it</h2>
+    <p>Run <code>python3 -m http.server</code> in the repo root and open
+       <code>http://localhost:8000/score_viewer.html</code>. The sample menu needs the
+       server; drag-and-drop works either way.</p>
+  </div>
+  <div id="decks">
+    <section class="deck" id="deck-a">
+      <h2><span class="name">Left</span> <span class="meta"></span></h2>
+      <div class="stage"><div class="osmd"></div><div class="mark"></div><div class="head"></div></div>
+    </section>
+    <section class="deck" id="deck-b">
+      <h2><span class="name">Right</span> <span class="meta"></span></h2>
+      <div class="stage"><div class="osmd"></div><div class="mark"></div><div class="head"></div></div>
+    </section>
+  </div>
+  <div id="diag"></div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.9/build/opensheetmusicdisplay.min.js"></script>
+<script>
+'use strict';
+
+const $ = id => document.getElementById(id);
+const scroller = document.querySelector('main');
+const DEFAULT_TEMPO = 100;          // miare's output carries no <sound tempo>, so the page sets one
+const LOOKAHEAD = 0.15;             // seconds of notes scheduled ahead of the audio clock
+
+/* Two decks: 'a' on the left, 'b' on the right. A deck holds one score, its OSMD
+   instance, the geometry of its rendered measures, and the notes to play. */
+const decks = {
+  a: newDeck('a', 'deck-a'),
+  b: newDeck('b', 'deck-b'),
+};
+
+function newDeck(key, elementId) {
+  const root = $(elementId);
+  return {
+    key, root,
+    stage: root.querySelector('.stage'),
+    host: root.querySelector('.osmd'),
+    mark: root.querySelector('.mark'),
+    head: root.querySelector('.head'),
+    nameEl: root.querySelector('.name'),
+    metaEl: root.querySelector('.meta'),
+    osmd: null,
+    name: '',
+    score: null,          // {notes, measures, divisions, tempo, quarters}
+    report: null,         // parsed .miare.json
+    geo: [],              // per measure: {x, w, top, bottom, anchors}
+    phraseEls: [],
+    lastTop: null,
+  };
+}
+
+const loaded = () => [decks.a, decks.b].filter(d => d.score);
+const setStatus = msg => { $('status').textContent = msg; };
+let lastLoaded = null;         // the deck a report with no name match belongs to
+
+/* ---------- MusicXML → note events ----------
+   Playback is synthesized from the same MusicXML OSMD renders, so there is no
+   recording and no separate MIDI export. One pass per part, tracking the cursor
+   the way MusicXML defines it: a note advances time, a <chord/> does not, and
+   <backup>/<forward> move the cursor outright. */
+
+const STEP_PC = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+
+function parseScore(text) {
+  const doc = new DOMParser().parseFromString(text, 'application/xml');
+  if (doc.querySelector('parsererror')) throw new Error('not readable as XML');
+  const root = doc.querySelector('score-partwise');
+  if (!root) throw new Error('not a score-partwise MusicXML file');
+
+  const num = (node, sel, fallback) => {
+    const hit = node && node.querySelector(sel);
+    const value = hit ? parseFloat(hit.textContent) : NaN;
+    return Number.isFinite(value) ? value : fallback;
+  };
+
+  const notes = [];           // {q, lenQ, midi, part, measure, inMeasure}
+  const measureStarts = [];   // quarter-note time each measure starts at
+  const measureLengths = [];
+  let divisions = 1, tempo = null, maxEnd = 0;
+  const widest = new Map();   // measure index → its longest length across the parts
+
+  const parts = [...root.querySelectorAll(':scope > part')];
+  parts.forEach((part, partIndex) => {
+    let q = 0;                               // quarters from the start of the score
+    [...part.querySelectorAll(':scope > measure')].forEach((measure, measureIndex) => {
+      divisions = num(measure, 'attributes > divisions', divisions);
+      const soundTempo = measure.querySelector('sound[tempo]');
+      if (soundTempo && tempo === null) tempo = parseFloat(soundTempo.getAttribute('tempo'));
+      const measureStart = q;
+      if (partIndex === 0) measureStarts.push(measureStart);
+      let cursor = q, furthest = q;
+
+      for (const node of measure.children) {
+        const tag = node.tagName;
+        if (tag === 'note') {
+          const lenQ = num(node, ':scope > duration', 0) / divisions;
+          const isChord = !!node.querySelector(':scope > chord');
+          const at = isChord ? (notes.length ? notes[notes.length - 1].q : cursor) : cursor;
+          const pitch = node.querySelector(':scope > pitch');
+          const tieStop = [...node.querySelectorAll(':scope > tie')]
+            .some(t => t.getAttribute('type') === 'stop');
+          if (pitch) {
+            const step = (pitch.querySelector('step') || {}).textContent;
+            const midi = 12 * (num(pitch, 'octave', 4) + 1)
+                       + (STEP_PC[step] ?? 0) + num(pitch, 'alter', 0);
+            const previous = notes.length ? notes[notes.length - 1] : null;
+            if (tieStop && previous && previous.part === partIndex && previous.midi === midi
+                && Math.abs(previous.q + previous.lenQ - at) < 1e-6) {
+              previous.lenQ += lenQ;        // a tie is one sound, not two
+            } else if (lenQ > 0) {
+              notes.push({
+                q: at, lenQ, midi, part: partIndex,
+                measure: measureIndex, inMeasure: at - measureStart,
+              });
+            }
+          }
+          if (!isChord) cursor += lenQ;
+        } else if (tag === 'backup') {
+          cursor -= num(node, ':scope > duration', 0) / divisions;
+        } else if (tag === 'forward') {
+          cursor += num(node, ':scope > duration', 0) / divisions;
+        }
+        furthest = Math.max(furthest, cursor);
+      }
+      q = furthest;
+      const length = q - measureStart;
+      widest.set(measureIndex, Math.max(widest.get(measureIndex) ?? 0, length));
+      if (partIndex === 0) measureLengths.push(length);
+      maxEnd = Math.max(maxEnd, q);
+    });
+  });
+
+  if (!notes.length) throw new Error('no sounding notes in that score');
+  notes.sort((x, y) => x.q - y.q);
+  return {
+    notes, divisions,
+    tempo: tempo || null,
+    measures: measureStarts.map((start, i) => ({
+      start,
+      length: widest.get(i) || measureLengths[i] || 0,
+    })),
+    quarters: maxEnd,
+    parts: parts.length,
+  };
+}
+
+/* ---------- loading ---------- */
+
+const isScore = name => /\.(musicxml|xml|mxl)$/i.test(name);
+const isReport = name => /\.json$/i.test(name);
+
+/* Scores first, then the reports, because a report attaches to a score that is open.
+   The two are told apart by extension, so a .musicxml and its .miare.json can be
+   dropped together or one at a time, in any order. */
+async function handleFiles(files) {
+  const scores = [...files].filter(f => isScore(f.name));
+  const reports = [...files].filter(f => isReport(f.name));
+  const others = [...files].filter(f => !isScore(f.name) && !isReport(f.name));
+  for (const file of scores) {
+    try {
+      await loadScoreInto(nextDeck(), file.name, await file.text());
+    } catch (e) {
+      setStatus(`Could not read ${file.name}: ${e.message || e}`);
+      return;
+    }
+  }
+  for (const file of reports) {
+    try {
+      attachReport(await file.text(), file.name);
+    } catch (e) {
+      setStatus(`Could not read ${file.name}: ${e.message || e}`);
+      return;
+    }
+  }
+  afterLoad();
+  if (others.length) {           // after afterLoad, which writes a status line of its own
+    setStatus(`${others.map(f => f.name).join(', ')}: only .musicxml and .miare.json open here.`);
+  }
+}
+
+/* Left first, then right; after that the right-hand deck is the one that cycles. */
+function nextDeck() {
+  return decks.a.score ? decks.b : decks.a;
+}
+
+async function loadScoreInto(deck, name, text) {
+  const score = parseScore(text);              // parse before touching the page
+  stop();
+  $('empty').hidden = true;
+  deck.root.classList.add('on');
+  deck.score = score;
+  deck.name = name;
+  deck.report = null;
+  lastLoaded = deck;
+  deck.nameEl.textContent = name;
+  deck.metaEl.textContent =
+    `${score.measures.length} measures · ${score.parts} part${score.parts === 1 ? '' : 's'} · ${score.notes.length} notes`;
+  setStatus(`Engraving ${name}…`);
+  if (!deck.osmd) {
+    deck.osmd = new opensheetmusicdisplay.OpenSheetMusicDisplay(deck.host, {
+      backend: 'svg', autoResize: false,
+      // The deck heading already names the score; a title block of its own would push
+      // the two columns out of line with each other.
+      drawTitle: false, drawSubtitle: false, drawComposer: false, drawLyricist: false,
+      drawPartNames: true,
+    });
+  }
+  await deck.osmd.load(text);
+  relayout(deck);
+  setStatus('');
+}
+
+/* OSMD engraves to whatever width its container has at render time, so a deck that was
+   still hidden when its neighbour rendered would leave that neighbour laid out across
+   the whole row. Every render goes through here, and loading the second score relays
+   out the first. */
+function relayout(deck) {
+  deck.osmd.render();
+  computeGeo(deck);
+  drawPhrases(deck);
+}
+
+/* A report names both its scores — `input` is the source, `output` the arrangement — so
+   it attaches to every open deck it names, and the phrase boundaries get drawn on both.
+   The phrases are the source melody's, which the arrangement keeps, so marking the pair
+   is what makes the two readable against each other.
+
+   A name alone is not enough: every sample calls its source `source.musicxml`, so the
+   deck also has to have the measure count the report recorded. A renamed or moved file
+   matches no name at all, and then the report goes to the score opened last — the one
+   it was dropped beside. */
+function attachReport(text, name) {
+  const report = JSON.parse(text);
+  const base = path => (path || '').split('/').pop().toLowerCase();
+  const wanted = [base(report.output), base(report.input)].filter(Boolean);
+  const measures = report.source?.measures;
+  const plausible = deck =>
+    !Number.isFinite(measures) || deck.score.measures.length === measures;
+  let targets = loaded().filter(d => wanted.includes(d.name.toLowerCase()) && plausible(d));
+  if (!targets.length) targets = loaded().filter(d => d === lastLoaded);
+  if (!targets.length) { setStatus(`${name} names no score that is open.`); return; }
+  for (const deck of targets) {
+    deck.report = report;
+    drawPhrases(deck);
+  }
+}
+
+function afterLoad() {
+  const open = loaded();
+  if (!open.length) return;
+  if (open.length === 2) open.forEach(relayout);     // both columns now have their width
+  $('tempo').value = Math.round(open.find(d => d.score.tempo)?.score.tempo || DEFAULT_TEMPO);
+  $('play').disabled = $('stop').disabled = $('seek').disabled = $('tempo').disabled = false;
+  buildTimeline();
+  updateAudioChoices();
+  renderDiagnostics();
+  $('seek').max = totalSeconds();
+  const counts = open.map(d => d.score.measures.length);
+  if (counts.length === 2 && counts[0] !== counts[1]) {
+    setStatus(`Left has ${counts[0]} measures, right has ${counts[1]}. Both play from measure 1, `
+            + `so the shorter one simply ends first.`);
+  }
+}
+
+/* ---------- the shared measure timeline ----------
+   Two scores of the same piece need not agree about elapsed time. miare's output drops
+   the source's pickup measure, so Greensleeves' measure 5 starts 2.5 quarters later on
+   the left than on the right. Playing both off their own clocks drifts by most of a
+   measure, which is exactly the comparison the page exists to make.
+
+   So measure N is the unit both decks share. The timeline gives each measure index one
+   start time, as wide as the widest version of that measure, and every deck places its
+   notes and its playhead inside that slot. The two stay in step whatever the scores do
+   with pickups and whatever a transcription does to measure lengths. */
+let timeline = [];            // per measure index: {start, length} in quarter notes
+
+function buildTimeline() {
+  const open = loaded();
+  const count = Math.max(0, ...open.map(d => d.score.measures.length));
+  timeline = [];
+  let at = 0;
+  for (let i = 0; i < count; i++) {
+    const length = Math.max(
+      0,
+      ...open.map(d => d.score.measures[i]?.length ?? 0),
+    ) || 1;
+    timeline.push({ start: at, length });
+    at += length;
+  }
+}
+
+/* Where a note sounds on the shared timeline: its own measure's slot, plus how far it
+   sits into that measure in its own score. */
+function sharedQuarters(note) {
+  const slot = timeline[note.measure];
+  if (!slot) return note.q;
+  return slot.start + Math.min(note.inMeasure, slot.length);
+}
+
+const timelineQuarters = () =>
+  timeline.length ? timeline[timeline.length - 1].start + timeline[timeline.length - 1].length : 0;
+
+/* ---------- samples served from samples/ ---------- */
+
+/* One sample = one directory with a committed source.musicxml plus the arrangements
+   scripts/make-samples.sh wrote next to it. Listed from the directory index
+   python3 -m http.server already serves, so nothing has to be picked on disk. */
+async function listSamples() {
+  let dirs;
+  try {
+    const listing = await fetch('samples/').then(r => r.text());
+    dirs = [...listing.matchAll(/href="([^"?]+)\/"/g)]
+      .map(m => decodeURIComponent(m[1]).replace(/\/$/, '').split('/').pop())
+      .filter(d => d && d !== '..');
+  } catch {
+    return;                           // opened as file://, or no samples/ — the picker still works
+  }
+  for (const dir of dirs) {
+    let names;
+    try {
+      const listing = await fetch(`samples/${encodeURIComponent(dir)}/`).then(r => r.text());
+      names = [...listing.matchAll(/href="([^"?/][^"]*)"/g)].map(m => decodeURIComponent(m[1]));
+    } catch { continue; }
+    const arrangements = names.filter(n => isScore(n) && n !== 'source.musicxml');
+    for (const arrangement of arrangements) {
+      const option = document.createElement('option');
+      option.value = JSON.stringify({ dir, arrangement });
+      option.textContent = `${dir} · ${arrangement.replace(/\.(musicxml|xml|mxl)$/i, '')}`;
+      $('samples').append(option);
+    }
+  }
+}
+
+async function openSample(value) {
+  const { dir, arrangement } = JSON.parse(value);
+  setStatus(`Opening ${dir}…`);
+  const grab = async name => {
+    const response = await fetch(`samples/${encodeURIComponent(dir)}/${encodeURIComponent(name)}`);
+    if (!response.ok) throw new Error(`${name}: HTTP ${response.status}`);
+    return response.text();
+  };
+  const report = arrangement.replace(/\.(musicxml|xml|mxl)$/i, '.miare.json');
+  try {
+    reset();
+    await loadScoreInto(decks.a, 'source.musicxml', await grab('source.musicxml'));
+    await loadScoreInto(decks.b, arrangement, await grab(arrangement));
+    try { attachReport(await grab(report), report); }
+    catch { /* a sample without its report still renders and plays */ }
+    afterLoad();
+    setStatus(`${dir}: source on the left, ${arrangement} on the right.`);
+  } catch (e) {
+    setStatus(`Could not open ${dir}: ${e.message || e}`);
+  }
+}
+
+function reset() {
+  stop();
+  for (const deck of [decks.a, decks.b]) {
+    deck.score = deck.report = null;
+    deck.geo = [];
+    deck.lastTop = null;
+    deck.root.classList.remove('on');
+    deck.phraseEls.forEach(el => el.remove());
+    deck.phraseEls = [];
+  }
+  timeline = [];
+  lastLoaded = null;
+  $('diag').textContent = '';
+}
+
+/* ---------- score geometry (OSMD graphic model → pixels) ---------- */
+
+function computeGeo(deck) {
+  deck.geo = [];
+  deck.lastTop = null;
+  const unit = 10 * deck.osmd.zoom;                 // OSMD units → px
+  const list = deck.osmd.GraphicSheet.MeasureList;
+  for (let i = 0; i < list.length; i++) {
+    const staves = (list[i] || []).filter(m => m && m.PositionAndShape);
+    if (!staves.length) { deck.geo.push(deck.geo[deck.geo.length - 1] || null); continue; }
+    const first = staves[0].PositionAndShape;
+    const last = staves[staves.length - 1].PositionAndShape;
+    const box = {
+      x: first.AbsolutePosition.x * unit,
+      w: first.Size.width * unit,
+      top: (first.AbsolutePosition.y - 1.5) * unit,
+      bottom: (last.AbsolutePosition.y + 5.5) * unit,   // a staff is 4 units tall
+      anchors: [],
+    };
+    // Where each notated moment sits across the measure, as a fraction of its duration.
+    const duration = staves[0].parentSourceMeasure.Duration.RealValue || 1;
+    const seen = new Map();
+    for (const measure of staves) for (const entry of measure.staffEntries || []) {
+      const fraction = Math.min(1, entry.relInMeasureTimestamp.RealValue / duration);
+      const x = entry.PositionAndShape.AbsolutePosition.x * unit;
+      if (!seen.has(fraction) || x < seen.get(fraction)) seen.set(fraction, x);
+    }
+    box.anchors = [...seen].map(([f, x]) => ({ f, x })).sort((p, q) => p.f - q.f);
+    if (!box.anchors.length || box.anchors[0].f > 0) {
+      box.anchors.unshift({ f: 0, x: box.anchors[0] ? box.anchors[0].x : box.x });
+    }
+    box.anchors = box.anchors.filter(a => a.f < 1);
+    box.anchors.push({ f: 1, x: box.x + box.w });
+    deck.geo.push(box);
+  }
+}
+
+function headX(box, fraction) {
+  const anchors = box.anchors;
+  for (let k = 1; k < anchors.length; k++) {
+    if (fraction <= anchors[k].f) {
+      const span = anchors[k].f - anchors[k - 1].f || 1;
+      return anchors[k - 1].x
+        + (anchors[k].x - anchors[k - 1].x) * (fraction - anchors[k - 1].f) / span;
+    }
+  }
+  return anchors[anchors.length - 1].x;
+}
+
+/* ---------- phrase boundaries from the .miare.json ---------- */
+
+/* analysis.phrases gives start/end in quarter notes, sometimes as a fraction string
+   ("37/2"), so read both forms. Each boundary is drawn at the measure it falls in. */
+const quarters = value => {
+  if (typeof value === 'number') return value;
+  const text = String(value ?? '');
+  const slash = text.indexOf('/');
+  if (slash < 0) return parseFloat(text);
+  return parseFloat(text.slice(0, slash)) / parseFloat(text.slice(slash + 1));
+};
+
+/* A phrase start is a time in the source's own quarters, so it is resolved against the
+   score the report calls `input` and then drawn by measure index on this deck. That is
+   what puts the same boundary over the same bar on both sides of a pickup difference. */
+function drawPhrases(deck) {
+  deck.phraseEls.forEach(el => el.remove());
+  deck.phraseEls = [];
+  const phrases = deck.report?.analysis?.phrases;
+  if (!phrases || !deck.geo.length) return;
+  const base = (deck.report.input || '').split('/').pop().toLowerCase();
+  const measures = deck.report.source?.measures;
+  const sourceDeck = loaded().find(d => d.name.toLowerCase() === base
+    && (!Number.isFinite(measures) || d.score.measures.length === measures)) || deck;
+  phrases.forEach((phrase, index) => {
+    const at = quarters(phrase.start);
+    if (!Number.isFinite(at)) return;
+    const { i, f } = positionInScore(sourceDeck, at);
+    const box = deck.geo[Math.min(i, deck.geo.length - 1)];
+    if (!box) return;
+    const el = document.createElement('div');
+    el.className = 'phrase';
+    el.style.cssText =
+      `display:block;left:${headX(box, f)}px;top:${box.top}px;height:${box.bottom - box.top}px`;
+    const tag = document.createElement('span');
+    tag.textContent = `P${index + 1}${phrase.cadence ? ` · ${phrase.cadence}` : ''}`;
+    el.append(tag);
+    deck.stage.append(el);
+    deck.phraseEls.push(el);
+  });
+}
+
+function renderDiagnostics() {
+  const blocks = [];
+  const seen = new Set();                 // one report can cover both decks
+  for (const deck of loaded()) {
+    const report = deck.report;
+    if (!report || seen.has(report)) continue;
+    seen.add(report);
+    const lines = [
+      ...(report.arrangement?.diagnostics || []),
+      ...(report.analysis?.diagnostics || []),
+    ];
+    const phrases = report.analysis?.phrases?.length;
+    const melody = report.analysis?.melody?.length;
+    const structural = report.analysis?.structural_melody?.length;
+    if (phrases) lines.unshift(`${phrases} phrases`);
+    if (melody && structural !== undefined) {
+      lines.unshift(`structural melody keeps ${structural} of ${melody} melody notes`);
+    }
+    if (!lines.length) continue;
+    const title = (report.output || deck.name).split('/').pop();
+    blocks.push(`<strong>${escapeText(title)}</strong><ul>${
+      lines.map(line => `<li>${escapeText(line)}</li>`).join('')
+    }</ul>`);
+  }
+  $('diag').innerHTML = blocks.join('');
+}
+
+/* Diagnostics are strings from a file the page did not write, so they are escaped. */
+function escapeText(value) {
+  return String(value).replace(/[<>&"]/g, c =>
+    ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c]));
+}
+
+/* ---------- transport ---------- */
+
+let audio = null;              // AudioContext, made on the first Play (a user gesture)
+let master = null;
+let playing = false;
+let offset = 0;                // seconds into the score when paused
+let startedAt = 0;             // audio-clock time the current run started from 0
+let scheduledTo = 0;           // how far ahead notes have been scheduled, in seconds
+let dragging = false;
+
+const bpm = () => Math.max(20, Math.min(300, parseFloat($('tempo').value) || DEFAULT_TEMPO));
+const secondsPerQuarter = () => 60 / bpm();
+const totalSeconds = () => timelineQuarters() * secondsPerQuarter();
+const now = () => (playing ? Math.min(audio.currentTime - startedAt, totalSeconds()) : offset);
+const fmt = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+
+function audibleDecks() {
+  const choice = $('audio').value;
+  if (choice === 'a') return [decks.a].filter(d => d.score);
+  if (choice === 'b') return [decks.b].filter(d => d.score);
+  return loaded();
+}
+
+/* Only offer "left only" / "right only" when there are two scores to choose between. */
+function updateAudioChoices() {
+  const two = loaded().length === 2;
+  $('audio').disabled = !two;
+  if (!two) $('audio').value = 'both';
+}
+
+function play() {
+  if (!loaded().length) return;
+  audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+  if (!master) {
+    master = audio.createGain();
+    master.gain.value = 0.9;
+    master.connect(audio.destination);
+  }
+  audio.resume();
+  if (offset >= totalSeconds() - 0.02) offset = 0;
+  startedAt = audio.currentTime - offset;
+  scheduledTo = offset;
+  playing = true;
+  $('play').textContent = 'Pause';
+}
+
+function pause() {
+  if (!playing) return;
+  offset = now();
+  playing = false;
+  silence();
+  $('play').textContent = 'Play';
+}
+
+function stop() {
+  playing = false;
+  offset = 0;
+  scheduledTo = 0;
+  silence();
+  $('play').textContent = 'Play';
+  $('seek').value = 0;
+}
+
+const voices = new Set();      // sounding oscillators, so a pause can cut them off
+let notesScheduled = 0;        // counted so a test can see notes really were played
+
+function silence() {
+  for (const voice of voices) {
+    try { voice.stop(); } catch { /* already stopped */ }
+  }
+  voices.clear();
+}
+
+function seek(seconds) {
+  const target = Math.max(0, Math.min(seconds, totalSeconds()));
+  const wasPlaying = playing;
+  pause();
+  offset = target;
+  if (wasPlaying) play(); else frameOnce();
+}
+
+/* One note: a triangle oscillator through its own envelope. No soundfont to fetch,
+   so the page works offline and on first load. */
+function sound(midi, at, seconds, gain) {
+  const osc = audio.createOscillator();
+  const env = audio.createGain();
+  osc.type = 'triangle';
+  osc.frequency.value = 440 * Math.pow(2, (midi - 69) / 12);
+  const end = at + Math.max(0.05, seconds);
+  env.gain.setValueAtTime(0, at);
+  env.gain.linearRampToValueAtTime(gain, at + 0.012);
+  env.gain.setTargetAtTime(0.0001, Math.max(at + 0.02, end - 0.08), 0.05);
+  osc.connect(env).connect(master);
+  osc.start(at);
+  osc.stop(end + 0.1);
+  voices.add(osc);
+  notesScheduled++;
+  osc.onended = () => voices.delete(osc);
+}
+
+/* Schedule every note starting inside the next LOOKAHEAD seconds. Each run of
+   requestAnimationFrame extends the window, so tempo changes take effect quickly. */
+function scheduleAhead() {
+  const until = now() + LOOKAHEAD;
+  if (until <= scheduledTo) return;
+  const spq = secondsPerQuarter();
+  const audible = audibleDecks();
+  const gain = 0.22 / Math.max(1, audible.length);
+  for (const deck of audible) {
+    for (const note of deck.score.notes) {
+      const at = sharedQuarters(note) * spq;
+      if (at < scheduledTo || at >= until) continue;
+      sound(note.midi, startedAt + at, note.lenQ * spq, gain);
+    }
+  }
+  scheduledTo = until;
+}
+
+/* ---------- playhead ---------- */
+
+/* Which measure of a grid a quarter-note time falls in, and how far across it. Tempo is
+   steady: the score is the only timing source here, there is no recording to follow. */
+function positionOn(measures, atQuarters) {
+  if (!measures.length) return { i: 0, f: 0 };
+  let low = 0, high = measures.length - 1;
+  while (low < high) {
+    const mid = (low + high + 1) >> 1;
+    if (measures[mid].start <= atQuarters) low = mid; else high = mid - 1;
+  }
+  const measure = measures[low];
+  const length = measure.length || 1;
+  return { i: low, f: Math.max(0, Math.min(1, (atQuarters - measure.start) / length)) };
+}
+
+/* On the shared timeline — what the transport runs on. */
+const positionAt = atQuarters => positionOn(timeline, atQuarters);
+
+/* In one score's own quarters — what a .miare.json phrase time is measured in. */
+const positionInScore = (deck, atQuarters) => positionOn(deck.score.measures, atQuarters);
+
+/* Both decks are painted from the same measure index and the same fraction across it,
+   so the two playheads stay together even where the scores disagree about elapsed time. */
+function paint(deck, seconds) {
+  if (!deck.score || !deck.geo.length) {
+    deck.mark.style.display = deck.head.style.display = 'none';
+    return null;
+  }
+  const { i, f } = positionAt(seconds / secondsPerQuarter());
+  if (i >= deck.score.measures.length) {       // this score is the shorter one; it has ended
+    deck.mark.style.display = deck.head.style.display = 'none';
+    return null;
+  }
+  const box = deck.geo[Math.min(i, deck.geo.length - 1)];
+  if (!box) return null;
+  deck.mark.style.cssText =
+    `display:block;left:${box.x}px;top:${box.top}px;width:${box.w}px;height:${box.bottom - box.top}px`;
+  deck.head.style.cssText =
+    `display:block;left:${headX(box, f)}px;top:${box.top}px;height:${box.bottom - box.top}px`;
+  return { deck, box, measure: i };
+}
+
+function frameOnce() {
+  const total = totalSeconds();
+  const at = now();
+  if (playing) {
+    scheduleAhead();
+    if (at >= total) { pause(); offset = total; }
+  }
+  if (!dragging) $('seek').value = at;
+  $('seek').max = total;
+  $('clock').textContent = `${fmt(at)} / ${fmt(total)}`;
+
+  let lead = null;
+  for (const deck of [decks.a, decks.b]) {
+    const painted = paint(deck, at);
+    if (painted && !lead) lead = painted;
+  }
+  $('bar').textContent = lead ? `measure ${lead.measure + 1}` : '';
+  if (lead && playing && lead.box.top !== lead.deck.lastTop) {
+    lead.deck.lastTop = lead.box.top;                    // moved to another line of music
+    const y = lead.deck.stage.offsetTop + lead.deck.root.offsetTop
+            + lead.box.top - scroller.clientHeight / 3;
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    scroller.scrollTo({ top: Math.max(0, y), behavior: calm ? 'auto' : 'smooth' });
+  }
+}
+
+function frame() {
+  frameOnce();
+  requestAnimationFrame(frame);
+}
+
+/* ---------- events ---------- */
+
+$('pick').addEventListener('change', event => {
+  handleFiles([...event.target.files]);
+  event.target.value = '';
+});
+$('samples').addEventListener('change', event => {
+  if (event.target.value) openSample(event.target.value);
+});
+$('play').addEventListener('click', () => (playing ? pause() : play()));
+$('stop').addEventListener('click', stop);
+$('audio').addEventListener('change', () => {
+  if (playing) { const at = now(); seek(at); }         // re-schedule from here with the new mix
+});
+$('tempo').addEventListener('change', () => {
+  const at = now();
+  const total = totalSeconds();
+  $('seek').max = total;
+  seek(Math.min(at, total));
+});
+$('seek').addEventListener('pointerdown', () => { dragging = true; });
+$('seek').addEventListener('input', event => seek(parseFloat(event.target.value)));
+$('seek').addEventListener('change', () => { dragging = false; });
+window.addEventListener('pointerup', () => { dragging = false; });
+
+document.addEventListener('keydown', event => {
+  if (event.code === 'Space' && !/^(INPUT|BUTTON|SELECT|TEXTAREA)$/.test(event.target.tagName)
+      && loaded().length) {
+    event.preventDefault();
+    playing ? pause() : play();
+  }
+});
+
+for (const deck of [decks.a, decks.b]) {
+  deck.stage.addEventListener('click', event => {
+    if (!deck.score || !deck.geo.length) return;
+    const rect = deck.stage.getBoundingClientRect();
+    const x = event.clientX - rect.left, y = event.clientY - rect.top;
+    const i = deck.geo.findIndex(box =>
+      box && x >= box.x && x <= box.x + box.w && y >= box.top && y <= box.bottom);
+    if (i >= 0 && timeline[i]) {
+      seek(timeline[i].start * secondsPerQuarter());   // click a measure, both jump to it
+    }
+  });
+}
+
+document.addEventListener('dragover', event => {
+  event.preventDefault();
+  document.body.classList.add('drop');
+});
+document.addEventListener('dragleave', () => document.body.classList.remove('drop'));
+document.addEventListener('drop', event => {
+  event.preventDefault();
+  document.body.classList.remove('drop');
+  handleFiles([...event.dataTransfer.files]);
+});
+
+let resizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => loaded().forEach(relayout), 250);
+});
+
+/* A read-only window on the page's state, for a browser test to assert against. */
+window.miareViewer = {
+  decks,
+  playing: () => playing,
+  seconds: () => now(),
+  totalSeconds,
+  notesScheduled: () => notesScheduled,
+  audible: () => audibleDecks().map(d => d.key),
+  timeline: () => timeline,
+  position: () => positionAt(now() / secondsPerQuarter()),
+  headLeft: key => decks[key].head.style.left,
+};
+
+requestAnimationFrame(frame);
+listSamples();
+</script>
+</body>
+</html>

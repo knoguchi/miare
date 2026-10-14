@@ -1,0 +1,5898 @@
+{
+  "miare_version": "0.1.0",
+  "input": "samples/short-tune/source.musicxml",
+  "output": "samples/short-tune/support.musicxml",
+  "seed": 1,
+  "source": {
+    "title": "Ode to Joy",
+    "parts": 1,
+    "measures": 8,
+    "notes": 30,
+    "duration_quarters": "32",
+    "key_signature": {
+      "fifths": 0,
+      "mode": "major"
+    },
+    "part_details": {
+      "P1": {
+        "name": "Melody",
+        "notes": 30,
+        "minimum_midi": 60,
+        "maximum_midi": 67,
+        "voices": [
+          "1"
+        ]
+      }
+    },
+    "diagnostics": []
+  },
+  "analysis": {
+    "tonic_pc": 0,
+    "mode": "major",
+    "melody_part_id": "P1",
+    "melody_voice": "1",
+    "melody": [
+      {
+        "id": "P1:m1:e1",
+        "part_id": "P1",
+        "measure_index": 0,
+        "start": "0",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m1:e2",
+        "part_id": "P1",
+        "measure_index": 0,
+        "start": "1",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m1:e3",
+        "part_id": "P1",
+        "measure_index": 0,
+        "start": "2",
+        "duration": "1",
+        "pitch": {
+          "step": "F",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m1:e4",
+        "part_id": "P1",
+        "measure_index": 0,
+        "start": "3",
+        "duration": "1",
+        "pitch": {
+          "step": "G",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m2:e5",
+        "part_id": "P1",
+        "measure_index": 1,
+        "start": "4",
+        "duration": "1",
+        "pitch": {
+          "step": "G",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m2:e6",
+        "part_id": "P1",
+        "measure_index": 1,
+        "start": "5",
+        "duration": "1",
+        "pitch": {
+          "step": "F",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m2:e7",
+        "part_id": "P1",
+        "measure_index": 1,
+        "start": "6",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m2:e8",
+        "part_id": "P1",
+        "measure_index": 1,
+        "start": "7",
+        "duration": "1",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m3:e9",
+        "part_id": "P1",
+        "measure_index": 2,
+        "start": "8",
+        "duration": "1",
+        "pitch": {
+          "step": "C",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m3:e10",
+        "part_id": "P1",
+        "measure_index": 2,
+        "start": "9",
+        "duration": "1",
+        "pitch": {
+          "step": "C",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m3:e11",
+        "part_id": "P1",
+        "measure_index": 2,
+        "start": "10",
+        "duration": "1",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m3:e12",
+        "part_id": "P1",
+        "measure_index": 2,
+        "start": "11",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m4:e13",
+        "part_id": "P1",
+        "measure_index": 3,
+        "start": "12",
+        "duration": "3/2",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 1,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m4:e14",
+        "part_id": "P1",
+        "measure_index": 3,
+        "start": "27/2",
+        "duration": "1/2",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "eighth",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m4:e15",
+        "part_id": "P1",
+        "measure_index": 3,
+        "start": "14",
+        "duration": "2",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "half",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m5:e16",
+        "part_id": "P1",
+        "measure_index": 4,
+        "start": "16",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m5:e17",
+        "part_id": "P1",
+        "measure_index": 4,
+        "start": "17",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m5:e18",
+        "part_id": "P1",
+        "measure_index": 4,
+        "start": "18",
+        "duration": "1",
+        "pitch": {
+          "step": "F",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m5:e19",
+        "part_id": "P1",
+        "measure_index": 4,
+        "start": "19",
+        "duration": "1",
+        "pitch": {
+          "step": "G",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m6:e20",
+        "part_id": "P1",
+        "measure_index": 5,
+        "start": "20",
+        "duration": "1",
+        "pitch": {
+          "step": "G",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m6:e21",
+        "part_id": "P1",
+        "measure_index": 5,
+        "start": "21",
+        "duration": "1",
+        "pitch": {
+          "step": "F",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m6:e22",
+        "part_id": "P1",
+        "measure_index": 5,
+        "start": "22",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m6:e23",
+        "part_id": "P1",
+        "measure_index": 5,
+        "start": "23",
+        "duration": "1",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m7:e24",
+        "part_id": "P1",
+        "measure_index": 6,
+        "start": "24",
+        "duration": "1",
+        "pitch": {
+          "step": "C",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m7:e25",
+        "part_id": "P1",
+        "measure_index": 6,
+        "start": "25",
+        "duration": "1",
+        "pitch": {
+          "step": "C",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m7:e26",
+        "part_id": "P1",
+        "measure_index": 6,
+        "start": "26",
+        "duration": "1",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m7:e27",
+        "part_id": "P1",
+        "measure_index": 6,
+        "start": "27",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m8:e28",
+        "part_id": "P1",
+        "measure_index": 7,
+        "start": "28",
+        "duration": "3/2",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 1,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m8:e29",
+        "part_id": "P1",
+        "measure_index": 7,
+        "start": "59/2",
+        "duration": "1/2",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "eighth",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m8:e30",
+        "part_id": "P1",
+        "measure_index": 7,
+        "start": "30",
+        "duration": "2",
+        "pitch": {
+          "step": "C",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "half",
+        "written_dots": 0,
+        "time_modification": null
+      }
+    ],
+    "structural_melody": [
+      {
+        "id": "P1:m1:e1",
+        "part_id": "P1",
+        "measure_index": 0,
+        "start": "0",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m1:e2",
+        "part_id": "P1",
+        "measure_index": 0,
+        "start": "1",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m1:e3",
+        "part_id": "P1",
+        "measure_index": 0,
+        "start": "2",
+        "duration": "1",
+        "pitch": {
+          "step": "F",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m1:e4",
+        "part_id": "P1",
+        "measure_index": 0,
+        "start": "3",
+        "duration": "1",
+        "pitch": {
+          "step": "G",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m2:e5",
+        "part_id": "P1",
+        "measure_index": 1,
+        "start": "4",
+        "duration": "1",
+        "pitch": {
+          "step": "G",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m2:e6",
+        "part_id": "P1",
+        "measure_index": 1,
+        "start": "5",
+        "duration": "1",
+        "pitch": {
+          "step": "F",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m2:e7",
+        "part_id": "P1",
+        "measure_index": 1,
+        "start": "6",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m2:e8",
+        "part_id": "P1",
+        "measure_index": 1,
+        "start": "7",
+        "duration": "1",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m3:e9",
+        "part_id": "P1",
+        "measure_index": 2,
+        "start": "8",
+        "duration": "1",
+        "pitch": {
+          "step": "C",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m3:e10",
+        "part_id": "P1",
+        "measure_index": 2,
+        "start": "9",
+        "duration": "1",
+        "pitch": {
+          "step": "C",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m3:e11",
+        "part_id": "P1",
+        "measure_index": 2,
+        "start": "10",
+        "duration": "1",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m3:e12",
+        "part_id": "P1",
+        "measure_index": 2,
+        "start": "11",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m4:e13",
+        "part_id": "P1",
+        "measure_index": 3,
+        "start": "12",
+        "duration": "3/2",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 1,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m4:e14",
+        "part_id": "P1",
+        "measure_index": 3,
+        "start": "27/2",
+        "duration": "1/2",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "eighth",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m4:e15",
+        "part_id": "P1",
+        "measure_index": 3,
+        "start": "14",
+        "duration": "2",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "half",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m5:e16",
+        "part_id": "P1",
+        "measure_index": 4,
+        "start": "16",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m5:e17",
+        "part_id": "P1",
+        "measure_index": 4,
+        "start": "17",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m5:e18",
+        "part_id": "P1",
+        "measure_index": 4,
+        "start": "18",
+        "duration": "1",
+        "pitch": {
+          "step": "F",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m5:e19",
+        "part_id": "P1",
+        "measure_index": 4,
+        "start": "19",
+        "duration": "1",
+        "pitch": {
+          "step": "G",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m6:e20",
+        "part_id": "P1",
+        "measure_index": 5,
+        "start": "20",
+        "duration": "1",
+        "pitch": {
+          "step": "G",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m6:e21",
+        "part_id": "P1",
+        "measure_index": 5,
+        "start": "21",
+        "duration": "1",
+        "pitch": {
+          "step": "F",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m6:e22",
+        "part_id": "P1",
+        "measure_index": 5,
+        "start": "22",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m6:e23",
+        "part_id": "P1",
+        "measure_index": 5,
+        "start": "23",
+        "duration": "1",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m7:e24",
+        "part_id": "P1",
+        "measure_index": 6,
+        "start": "24",
+        "duration": "1",
+        "pitch": {
+          "step": "C",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m7:e25",
+        "part_id": "P1",
+        "measure_index": 6,
+        "start": "25",
+        "duration": "1",
+        "pitch": {
+          "step": "C",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m7:e26",
+        "part_id": "P1",
+        "measure_index": 6,
+        "start": "26",
+        "duration": "1",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m7:e27",
+        "part_id": "P1",
+        "measure_index": 6,
+        "start": "27",
+        "duration": "1",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m8:e28",
+        "part_id": "P1",
+        "measure_index": 7,
+        "start": "28",
+        "duration": "3/2",
+        "pitch": {
+          "step": "D",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "quarter",
+        "written_dots": 1,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m8:e29",
+        "part_id": "P1",
+        "measure_index": 7,
+        "start": "59/2",
+        "duration": "1/2",
+        "pitch": {
+          "step": "E",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "eighth",
+        "written_dots": 0,
+        "time_modification": null
+      },
+      {
+        "id": "P1:m8:e30",
+        "part_id": "P1",
+        "measure_index": 7,
+        "start": "30",
+        "duration": "2",
+        "pitch": {
+          "step": "C",
+          "octave": 4,
+          "alter": 0
+        },
+        "voice": "1",
+        "staff": "1",
+        "tie_start": false,
+        "tie_stop": false,
+        "notations": [],
+        "written_type": "half",
+        "written_dots": 0,
+        "time_modification": null
+      }
+    ],
+    "phrases": [
+      {
+        "id": "phrase-1",
+        "start": "0",
+        "end": "16",
+        "apex_midi": 67,
+        "cadence": "open",
+        "evidence": [
+          "four-measure grouping"
+        ]
+      },
+      {
+        "id": "phrase-2",
+        "start": "16",
+        "end": "32",
+        "apex_midi": 67,
+        "cadence": "tonic-arrival",
+        "evidence": [
+          "end of melody"
+        ]
+      }
+    ],
+    "harmony": [
+      {
+        "id": "harmony-1",
+        "start": "0",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 3.8,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": [
+              "opening tonic"
+            ]
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": 3.0,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": 3.0,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": -0.7,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 1
+      },
+      {
+        "id": "harmony-2",
+        "start": "2",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -1.15,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 2
+      },
+      {
+        "id": "harmony-3",
+        "start": "4",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 1.4500000000000002,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": 1.4500000000000002,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": 1.4500000000000002,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -1.1500000000000001,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 5
+      },
+      {
+        "id": "harmony-4",
+        "start": "6",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -1.1500000000000001,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -1.1500000000000001,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 1
+      },
+      {
+        "id": "harmony-5",
+        "start": "8",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 3.0,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": 3.0,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": 3.0,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": -0.7,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 4
+      },
+      {
+        "id": "harmony-6",
+        "start": "10",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -1.15,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -1.15,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 5
+      },
+      {
+        "id": "harmony-7",
+        "start": "12",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 2.5250000000000004,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": 2.5250000000000004,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": 2.5250000000000004,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": 0.07500000000000007,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": 0.07500000000000007,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": 0.07500000000000007,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -1.9249999999999998,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -1.9249999999999998,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 1
+      },
+      {
+        "id": "harmony-8",
+        "start": "14",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": 2.9,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": [
+              "phrase-end dominant arrival"
+            ]
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": 2.4,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": 2.4,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 0.5,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": [
+              "phrase-end tonic arrival"
+            ]
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": 0.3999999999999999,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": 0.3999999999999999,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 5
+      },
+      {
+        "id": "harmony-9",
+        "start": "16",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 3.0,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": 3.0,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": 3.0,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": -0.7,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 1
+      },
+      {
+        "id": "harmony-10",
+        "start": "18",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -1.15,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 2
+      },
+      {
+        "id": "harmony-11",
+        "start": "20",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 1.4500000000000002,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": 1.4500000000000002,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": 1.4500000000000002,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -1.1500000000000001,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 5
+      },
+      {
+        "id": "harmony-12",
+        "start": "22",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -1.1500000000000001,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -1.1500000000000001,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 1
+      },
+      {
+        "id": "harmony-13",
+        "start": "24",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 3.0,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": 3.0,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": 3.0,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": -0.7,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 1
+      },
+      {
+        "id": "harmony-14",
+        "start": "26",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": 0.85,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": 0.85,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": 0.85,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -1.15,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -1.15,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 2
+      },
+      {
+        "id": "harmony-15",
+        "start": "28",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": 2.5250000000000004,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": 2.5250000000000004,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": 2.5250000000000004,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": 0.5250000000000001,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": 0.5250000000000001,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 0.07500000000000007,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": 0.07500000000000007,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": [
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": 0.07500000000000007,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": -0.7,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 5
+      },
+      {
+        "id": "harmony-16",
+        "start": "30",
+        "duration": "2",
+        "candidates": [
+          {
+            "degree": 1,
+            "root_pc": 0,
+            "quality": "major",
+            "score": 3.5999999999999996,
+            "pcs": [
+              0,
+              4,
+              7
+            ],
+            "reasons": [
+              "phrase-end tonic arrival",
+              "root present in melody"
+            ]
+          },
+          {
+            "degree": 4,
+            "root_pc": 5,
+            "quality": "major",
+            "score": 2.4,
+            "pcs": [
+              0,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 6,
+            "root_pc": 9,
+            "quality": "minor",
+            "score": 2.4,
+            "pcs": [
+              0,
+              4,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 5,
+            "root_pc": 7,
+            "quality": "major",
+            "score": -0.19999999999999996,
+            "pcs": [
+              2,
+              7,
+              11
+            ],
+            "reasons": [
+              "phrase-end dominant arrival"
+            ]
+          },
+          {
+            "degree": 2,
+            "root_pc": 2,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              2,
+              5,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 3,
+            "root_pc": 4,
+            "quality": "minor",
+            "score": -0.7,
+            "pcs": [
+              4,
+              7,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 7,
+            "root_pc": 11,
+            "quality": "diminished",
+            "score": -0.7,
+            "pcs": [
+              2,
+              5,
+              11
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 8,
+            "root_pc": 2,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              6,
+              9
+            ],
+            "reasons": []
+          },
+          {
+            "degree": 9,
+            "root_pc": 10,
+            "quality": "major",
+            "score": -2.7,
+            "pcs": [
+              2,
+              5,
+              10
+            ],
+            "reasons": []
+          }
+        ],
+        "selected_degree": 1
+      }
+    ],
+    "musical_language": {
+      "phrase_lengths": [
+        "16",
+        "16"
+      ],
+      "rhythmic_vocabulary": {
+        "1": 24,
+        "3/2": 2,
+        "1/2": 2,
+        "2": 2
+      },
+      "accent_patterns": {
+        "beat-1": 8,
+        "beat-3": 8,
+        "beat-2": 6,
+        "beat-4": 6,
+        "beat-5/2": 2
+      },
+      "motif_vocabulary": [
+        {
+          "intervals": [
+            2,
+            0,
+            -2
+          ],
+          "occurrences": 3
+        },
+        {
+          "intervals": [
+            -2,
+            0,
+            2
+          ],
+          "occurrences": 3
+        },
+        {
+          "intervals": [
+            0,
+            1,
+            2
+          ],
+          "occurrences": 2
+        },
+        {
+          "intervals": [
+            1,
+            2,
+            0
+          ],
+          "occurrences": 2
+        },
+        {
+          "intervals": [
+            0,
+            -2,
+            -1
+          ],
+          "occurrences": 2
+        },
+        {
+          "intervals": [
+            -2,
+            -1,
+            -2
+          ],
+          "occurrences": 2
+        },
+        {
+          "intervals": [
+            -1,
+            -2,
+            -2
+          ],
+          "occurrences": 2
+        },
+        {
+          "intervals": [
+            -2,
+            -2,
+            0
+          ],
+          "occurrences": 2
+        }
+      ],
+      "non_chord_tone_ratio": 0.333,
+      "cadence_patterns": [
+        "open",
+        "tonic-arrival"
+      ],
+      "register_usage": {
+        "minimum": 60,
+        "maximum": 67,
+        "apex": 67
+      },
+      "density_curve": [
+        1.0,
+        1.0,
+        1.0,
+        0.75,
+        1.0,
+        1.0,
+        1.0,
+        0.75
+      ],
+      "unknown_fields": [
+        "bassIdioms",
+        "texturePatterns",
+        "interVoiceResponse"
+      ],
+      "evidence": [
+        {
+          "kind": "phrase",
+          "id": "phrase-1",
+          "span": [
+            "0",
+            "16"
+          ],
+          "cadence": "open"
+        },
+        {
+          "kind": "phrase",
+          "id": "phrase-2",
+          "span": [
+            "16",
+            "32"
+          ],
+          "cadence": "tonic-arrival"
+        },
+        {
+          "kind": "motif",
+          "intervals": [
+            2,
+            0,
+            -2
+          ],
+          "occurrences": 3
+        },
+        {
+          "kind": "motif",
+          "intervals": [
+            -2,
+            0,
+            2
+          ],
+          "occurrences": 3
+        },
+        {
+          "kind": "motif",
+          "intervals": [
+            0,
+            1,
+            2
+          ],
+          "occurrences": 2
+        },
+        {
+          "kind": "motif",
+          "intervals": [
+            1,
+            2,
+            0
+          ],
+          "occurrences": 2
+        },
+        {
+          "kind": "motif",
+          "intervals": [
+            0,
+            -2,
+            -1
+          ],
+          "occurrences": 2
+        },
+        {
+          "kind": "motif",
+          "intervals": [
+            -2,
+            -1,
+            -2
+          ],
+          "occurrences": 2
+        },
+        {
+          "kind": "motif",
+          "intervals": [
+            -1,
+            -2,
+            -2
+          ],
+          "occurrences": 2
+        },
+        {
+          "kind": "motif",
+          "intervals": [
+            -2,
+            -2,
+            0
+          ],
+          "occurrences": 2
+        }
+      ]
+    },
+    "diagnostics": [
+      "primary melody selected from P1 voice 1: part=Melody, voice=1, monophony=1.00, stepwise-continuity=1.00",
+      "key taken from MusicXML signature: tonic_pc=0, mode=major"
+    ]
+  },
+  "arrangement": {
+    "voices": [
+      {
+        "id": "voice1",
+        "profile": {
+          "id": "violin",
+          "name": "Violin",
+          "min_midi": 55,
+          "max_midi": 103,
+          "preferred_min": 60,
+          "preferred_max": 96,
+          "clef_sign": "G",
+          "clef_line": 2
+        },
+        "events": [
+          {
+            "id": "melody:P1:m1:e1",
+            "start": "0",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m1:e1"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m1:e2",
+            "start": "1",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m1:e2"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m1:e3",
+            "start": "2",
+            "duration": "1",
+            "pitch": {
+              "step": "F",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m1:e3"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m1:e4",
+            "start": "3",
+            "duration": "1",
+            "pitch": {
+              "step": "G",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m1:e4"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m2:e5",
+            "start": "4",
+            "duration": "1",
+            "pitch": {
+              "step": "G",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m2:e5"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m2:e6",
+            "start": "5",
+            "duration": "1",
+            "pitch": {
+              "step": "F",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m2:e6"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m2:e7",
+            "start": "6",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m2:e7"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m2:e8",
+            "start": "7",
+            "duration": "1",
+            "pitch": {
+              "step": "D",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m2:e8"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m3:e9",
+            "start": "8",
+            "duration": "1",
+            "pitch": {
+              "step": "C",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m3:e9"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m3:e10",
+            "start": "9",
+            "duration": "1",
+            "pitch": {
+              "step": "C",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m3:e10"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m3:e11",
+            "start": "10",
+            "duration": "1",
+            "pitch": {
+              "step": "D",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m3:e11"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m3:e12",
+            "start": "11",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m3:e12"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m4:e13",
+            "start": "12",
+            "duration": "3/2",
+            "pitch": {
+              "step": "E",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m4:e13"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 1,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m4:e14",
+            "start": "27/2",
+            "duration": "1/2",
+            "pitch": {
+              "step": "D",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m4:e14"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "eighth",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m4:e15",
+            "start": "14",
+            "duration": "2",
+            "pitch": {
+              "step": "D",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m4:e15"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "half",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m5:e16",
+            "start": "16",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m5:e16"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m5:e17",
+            "start": "17",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m5:e17"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m5:e18",
+            "start": "18",
+            "duration": "1",
+            "pitch": {
+              "step": "F",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m5:e18"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m5:e19",
+            "start": "19",
+            "duration": "1",
+            "pitch": {
+              "step": "G",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m5:e19"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m6:e20",
+            "start": "20",
+            "duration": "1",
+            "pitch": {
+              "step": "G",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m6:e20"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m6:e21",
+            "start": "21",
+            "duration": "1",
+            "pitch": {
+              "step": "F",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m6:e21"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m6:e22",
+            "start": "22",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m6:e22"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m6:e23",
+            "start": "23",
+            "duration": "1",
+            "pitch": {
+              "step": "D",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m6:e23"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m7:e24",
+            "start": "24",
+            "duration": "1",
+            "pitch": {
+              "step": "C",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m7:e24"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m7:e25",
+            "start": "25",
+            "duration": "1",
+            "pitch": {
+              "step": "C",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m7:e25"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m7:e26",
+            "start": "26",
+            "duration": "1",
+            "pitch": {
+              "step": "D",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m7:e26"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m7:e27",
+            "start": "27",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m7:e27"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m8:e28",
+            "start": "28",
+            "duration": "3/2",
+            "pitch": {
+              "step": "D",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m8:e28"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "quarter",
+            "written_dots": 1,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m8:e29",
+            "start": "59/2",
+            "duration": "1/2",
+            "pitch": {
+              "step": "E",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m8:e29"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "eighth",
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "melody:P1:m8:e30",
+            "start": "30",
+            "duration": "2",
+            "pitch": {
+              "step": "C",
+              "octave": 4,
+              "alter": 0
+            },
+            "role": "melody",
+            "source_ids": [
+              "P1:m8:e30"
+            ],
+            "rationale": [
+              "preserved primary melody",
+              "original register"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": "half",
+            "written_dots": 0,
+            "time_modification": null
+          }
+        ]
+      },
+      {
+        "id": "voice2",
+        "profile": {
+          "id": "cello",
+          "name": "Violoncello",
+          "min_midi": 36,
+          "max_midi": 76,
+          "preferred_min": 43,
+          "preferred_max": 69,
+          "clef_sign": "F",
+          "clef_line": 4
+        },
+        "events": [
+          {
+            "id": "support-1-1",
+            "start": "0",
+            "duration": "1",
+            "pitch": {
+              "step": "C",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m1:e1"
+            ],
+            "rationale": [
+              "harmony-1: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "harmonic root"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-1-2",
+            "start": "1",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m1:e2"
+            ],
+            "rationale": [
+              "harmony-1: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-2-1",
+            "start": "2",
+            "duration": "1",
+            "pitch": {
+              "step": "D",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m1:e3"
+            ],
+            "rationale": [
+              "harmony-2: degree 2",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "harmonic root",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-2-2",
+            "start": "3",
+            "duration": "1",
+            "pitch": {
+              "step": "A",
+              "octave": 2,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m1:e4"
+            ],
+            "rationale": [
+              "harmony-2: degree 2",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-3-1",
+            "start": "4",
+            "duration": "1",
+            "pitch": {
+              "step": "G",
+              "octave": 2,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m2:e5"
+            ],
+            "rationale": [
+              "harmony-3: degree 5",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "harmonic root",
+              "smooth support-line motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-3-2",
+            "start": "5",
+            "duration": "1",
+            "pitch": {
+              "step": "B",
+              "octave": 2,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m2:e6"
+            ],
+            "rationale": [
+              "harmony-3: degree 5",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-4-1",
+            "start": "6",
+            "duration": "1",
+            "pitch": {
+              "step": "C",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m2:e7"
+            ],
+            "rationale": [
+              "harmony-4: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "harmonic root",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-4-2",
+            "start": "7",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m2:e8"
+            ],
+            "rationale": [
+              "harmony-4: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-5-1",
+            "start": "8",
+            "duration": "1",
+            "pitch": {
+              "step": "F",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m3:e9"
+            ],
+            "rationale": [
+              "harmony-5: degree 4",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "harmonic root",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-5-2",
+            "start": "9",
+            "duration": "1",
+            "pitch": {
+              "step": "F",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m3:e10"
+            ],
+            "rationale": [
+              "harmony-5: degree 4",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "harmonic root",
+              "smooth support-line motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-6-1",
+            "start": "10",
+            "duration": "1",
+            "pitch": {
+              "step": "D",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m3:e11"
+            ],
+            "rationale": [
+              "harmony-6: degree 5",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-6-2",
+            "start": "11",
+            "duration": "1",
+            "pitch": {
+              "step": "B",
+              "octave": 2,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m3:e12"
+            ],
+            "rationale": [
+              "harmony-6: degree 5",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-7-1",
+            "start": "12",
+            "duration": "1",
+            "pitch": {
+              "step": "C",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m4:e13"
+            ],
+            "rationale": [
+              "harmony-7: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "harmonic root",
+              "smooth support-line motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-7-2",
+            "start": "13",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m4:e13",
+              "P1:m4:e14"
+            ],
+            "rationale": [
+              "harmony-7: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-8-1",
+            "start": "14",
+            "duration": "1",
+            "pitch": {
+              "step": "D",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m4:e15"
+            ],
+            "rationale": [
+              "harmony-8: degree 5",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "parallel perfect — hard banned"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-8-2",
+            "start": "15",
+            "duration": "1",
+            "pitch": {
+              "step": "G",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m4:e15"
+            ],
+            "rationale": [
+              "harmony-8: degree 5",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "harmonic root",
+              "cadential root",
+              "smooth support-line motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-9-1",
+            "start": "16",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m5:e16"
+            ],
+            "rationale": [
+              "harmony-9: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-9-2",
+            "start": "17",
+            "duration": "1",
+            "pitch": {
+              "step": "C",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m5:e17"
+            ],
+            "rationale": [
+              "harmony-9: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "harmonic root",
+              "smooth support-line motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-10-1",
+            "start": "18",
+            "duration": "1",
+            "pitch": {
+              "step": "D",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m5:e18"
+            ],
+            "rationale": [
+              "harmony-10: degree 2",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "harmonic root",
+              "smooth support-line motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-10-2",
+            "start": "19",
+            "duration": "1",
+            "pitch": {
+              "step": "A",
+              "octave": 2,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m5:e19"
+            ],
+            "rationale": [
+              "harmony-10: degree 2",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-11-1",
+            "start": "20",
+            "duration": "1",
+            "pitch": {
+              "step": "G",
+              "octave": 2,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m6:e20"
+            ],
+            "rationale": [
+              "harmony-11: degree 5",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "harmonic root",
+              "smooth support-line motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-11-2",
+            "start": "21",
+            "duration": "1",
+            "pitch": {
+              "step": "B",
+              "octave": 2,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m6:e21"
+            ],
+            "rationale": [
+              "harmony-11: degree 5",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-12-1",
+            "start": "22",
+            "duration": "1",
+            "pitch": {
+              "step": "C",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m6:e22"
+            ],
+            "rationale": [
+              "harmony-12: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "harmonic root",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-12-2",
+            "start": "23",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m6:e23"
+            ],
+            "rationale": [
+              "harmony-12: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-13-1",
+            "start": "24",
+            "duration": "1",
+            "pitch": {
+              "step": "G",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m7:e24"
+            ],
+            "rationale": [
+              "harmony-13: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-13-2",
+            "start": "25",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m7:e25"
+            ],
+            "rationale": [
+              "harmony-13: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-14-1",
+            "start": "26",
+            "duration": "1",
+            "pitch": {
+              "step": "D",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m7:e26"
+            ],
+            "rationale": [
+              "harmony-14: degree 2",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "harmonic root",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-14-2",
+            "start": "27",
+            "duration": "1",
+            "pitch": {
+              "step": "A",
+              "octave": 2,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m7:e27"
+            ],
+            "rationale": [
+              "harmony-14: degree 2",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-15-1",
+            "start": "28",
+            "duration": "1",
+            "pitch": {
+              "step": "B",
+              "octave": 2,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m8:e28"
+            ],
+            "rationale": [
+              "harmony-15: degree 5",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-15-2",
+            "start": "29",
+            "duration": "1",
+            "pitch": {
+              "step": "D",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m8:e28",
+              "P1:m8:e29"
+            ],
+            "rationale": [
+              "harmony-15: degree 5",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-16-1",
+            "start": "30",
+            "duration": "1",
+            "pitch": {
+              "step": "E",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m8:e30"
+            ],
+            "rationale": [
+              "harmony-16: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "smooth support-line motion",
+              "contrary motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          },
+          {
+            "id": "support-16-2",
+            "start": "31",
+            "duration": "1",
+            "pitch": {
+              "step": "C",
+              "octave": 3,
+              "alter": 0
+            },
+            "role": "bass",
+            "source_ids": [
+              "P1:m8:e30"
+            ],
+            "rationale": [
+              "harmony-16: degree 1",
+              "rhythm 1 borrowed from source vocabulary",
+              "preferred register",
+              "clear melodic/support register",
+              "harmonic root",
+              "cadential root",
+              "smooth support-line motion"
+            ],
+            "tie_start": false,
+            "tie_stop": false,
+            "notations": [],
+            "written_type": null,
+            "written_dots": 0,
+            "time_modification": null
+          }
+        ]
+      }
+    ],
+    "relationship": "support",
+    "diagnostics": [],
+    "provenance": [
+      {
+        "event_id": "melody:P1:m1:e1",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m1:e1"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m1:e2",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m1:e2"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m1:e3",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m1:e3"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m1:e4",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m1:e4"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m2:e5",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m2:e5"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m2:e6",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m2:e6"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m2:e7",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m2:e7"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m2:e8",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m2:e8"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m3:e9",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m3:e9"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m3:e10",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m3:e10"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m3:e11",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m3:e11"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m3:e12",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m3:e12"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m4:e13",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m4:e13"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m4:e14",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m4:e14"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m4:e15",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m4:e15"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m5:e16",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m5:e16"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m5:e17",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m5:e17"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m5:e18",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m5:e18"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m5:e19",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m5:e19"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m6:e20",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m6:e20"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m6:e21",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m6:e21"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m6:e22",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m6:e22"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m6:e23",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m6:e23"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m7:e24",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m7:e24"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m7:e25",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m7:e25"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m7:e26",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m7:e26"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m7:e27",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m7:e27"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m8:e28",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m8:e28"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m8:e29",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m8:e29"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "melody:P1:m8:e30",
+        "kind": "source-melody",
+        "source_event_ids": [
+          "P1:m8:e30"
+        ],
+        "rationale": [
+          "preserved primary melody",
+          "original register"
+        ]
+      },
+      {
+        "event_id": "support-1-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-1",
+        "source_event_ids": [
+          "P1:m1:e1"
+        ],
+        "rationale": [
+          "harmony-1: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "harmonic root"
+        ]
+      },
+      {
+        "event_id": "support-1-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-1",
+        "source_event_ids": [
+          "P1:m1:e2"
+        ],
+        "rationale": [
+          "harmony-1: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion"
+        ]
+      },
+      {
+        "event_id": "support-2-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-2",
+        "source_event_ids": [
+          "P1:m1:e3"
+        ],
+        "rationale": [
+          "harmony-2: degree 2",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "harmonic root",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-2-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-2",
+        "source_event_ids": [
+          "P1:m1:e4"
+        ],
+        "rationale": [
+          "harmony-2: degree 2",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-3-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-3",
+        "source_event_ids": [
+          "P1:m2:e5"
+        ],
+        "rationale": [
+          "harmony-3: degree 5",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "harmonic root",
+          "smooth support-line motion"
+        ]
+      },
+      {
+        "event_id": "support-3-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-3",
+        "source_event_ids": [
+          "P1:m2:e6"
+        ],
+        "rationale": [
+          "harmony-3: degree 5",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-4-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-4",
+        "source_event_ids": [
+          "P1:m2:e7"
+        ],
+        "rationale": [
+          "harmony-4: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "harmonic root",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-4-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-4",
+        "source_event_ids": [
+          "P1:m2:e8"
+        ],
+        "rationale": [
+          "harmony-4: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-5-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-5",
+        "source_event_ids": [
+          "P1:m3:e9"
+        ],
+        "rationale": [
+          "harmony-5: degree 4",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "harmonic root",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-5-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-5",
+        "source_event_ids": [
+          "P1:m3:e10"
+        ],
+        "rationale": [
+          "harmony-5: degree 4",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "harmonic root",
+          "smooth support-line motion"
+        ]
+      },
+      {
+        "event_id": "support-6-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-6",
+        "source_event_ids": [
+          "P1:m3:e11"
+        ],
+        "rationale": [
+          "harmony-6: degree 5",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-6-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-6",
+        "source_event_ids": [
+          "P1:m3:e12"
+        ],
+        "rationale": [
+          "harmony-6: degree 5",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-7-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-7",
+        "source_event_ids": [
+          "P1:m4:e13"
+        ],
+        "rationale": [
+          "harmony-7: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "harmonic root",
+          "smooth support-line motion"
+        ]
+      },
+      {
+        "event_id": "support-7-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-7",
+        "source_event_ids": [
+          "P1:m4:e13",
+          "P1:m4:e14"
+        ],
+        "rationale": [
+          "harmony-7: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion"
+        ]
+      },
+      {
+        "event_id": "support-8-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-8",
+        "source_event_ids": [
+          "P1:m4:e15"
+        ],
+        "rationale": [
+          "harmony-8: degree 5",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "parallel perfect — hard banned"
+        ]
+      },
+      {
+        "event_id": "support-8-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-8",
+        "source_event_ids": [
+          "P1:m4:e15"
+        ],
+        "rationale": [
+          "harmony-8: degree 5",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "harmonic root",
+          "cadential root",
+          "smooth support-line motion"
+        ]
+      },
+      {
+        "event_id": "support-9-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-9",
+        "source_event_ids": [
+          "P1:m5:e16"
+        ],
+        "rationale": [
+          "harmony-9: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-9-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-9",
+        "source_event_ids": [
+          "P1:m5:e17"
+        ],
+        "rationale": [
+          "harmony-9: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "harmonic root",
+          "smooth support-line motion"
+        ]
+      },
+      {
+        "event_id": "support-10-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-10",
+        "source_event_ids": [
+          "P1:m5:e18"
+        ],
+        "rationale": [
+          "harmony-10: degree 2",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "harmonic root",
+          "smooth support-line motion"
+        ]
+      },
+      {
+        "event_id": "support-10-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-10",
+        "source_event_ids": [
+          "P1:m5:e19"
+        ],
+        "rationale": [
+          "harmony-10: degree 2",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-11-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-11",
+        "source_event_ids": [
+          "P1:m6:e20"
+        ],
+        "rationale": [
+          "harmony-11: degree 5",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "harmonic root",
+          "smooth support-line motion"
+        ]
+      },
+      {
+        "event_id": "support-11-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-11",
+        "source_event_ids": [
+          "P1:m6:e21"
+        ],
+        "rationale": [
+          "harmony-11: degree 5",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-12-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-12",
+        "source_event_ids": [
+          "P1:m6:e22"
+        ],
+        "rationale": [
+          "harmony-12: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "harmonic root",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-12-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-12",
+        "source_event_ids": [
+          "P1:m6:e23"
+        ],
+        "rationale": [
+          "harmony-12: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-13-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-13",
+        "source_event_ids": [
+          "P1:m7:e24"
+        ],
+        "rationale": [
+          "harmony-13: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-13-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-13",
+        "source_event_ids": [
+          "P1:m7:e25"
+        ],
+        "rationale": [
+          "harmony-13: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion"
+        ]
+      },
+      {
+        "event_id": "support-14-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-14",
+        "source_event_ids": [
+          "P1:m7:e26"
+        ],
+        "rationale": [
+          "harmony-14: degree 2",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "harmonic root",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-14-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-14",
+        "source_event_ids": [
+          "P1:m7:e27"
+        ],
+        "rationale": [
+          "harmony-14: degree 2",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-15-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-15",
+        "source_event_ids": [
+          "P1:m8:e28"
+        ],
+        "rationale": [
+          "harmony-15: degree 5",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-15-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-15",
+        "source_event_ids": [
+          "P1:m8:e28",
+          "P1:m8:e29"
+        ],
+        "rationale": [
+          "harmony-15: degree 5",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion"
+        ]
+      },
+      {
+        "event_id": "support-16-1",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-16",
+        "source_event_ids": [
+          "P1:m8:e30"
+        ],
+        "rationale": [
+          "harmony-16: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "smooth support-line motion",
+          "contrary motion"
+        ]
+      },
+      {
+        "event_id": "support-16-2",
+        "kind": "source-language-conditioned-generation",
+        "harmony_id": "harmony-16",
+        "source_event_ids": [
+          "P1:m8:e30"
+        ],
+        "rationale": [
+          "harmony-16: degree 1",
+          "rhythm 1 borrowed from source vocabulary",
+          "preferred register",
+          "clear melodic/support register",
+          "harmonic root",
+          "cadential root",
+          "smooth support-line motion"
+        ]
+      }
+    ]
+  },
+  "round_trip": {
+    "valid": true,
+    "errors": []
+  }
+}

@@ -218,12 +218,15 @@ __marimo__/
 .streamlit/secrets.toml
 
 # Arrangement runs. miare regenerates these from a source score plus a seed,
-# so they are outputs rather than inputs. Test fixtures are exempted below
-# because the suite reads them.
+# so they are outputs rather than inputs. Test fixtures and the viewer's demo
+# samples are exempted below: the suite reads the first, score_viewer.html
+# serves the second, and both are regenerated on purpose rather than per run.
 *.miare.json
 *.mscz
 /*.musicxml
 !tests/fixtures/*.musicxml
+!samples/*/*.musicxml
+!samples/*/*.miare.json
 
 # super-board. The pack itself (.claude/bin, skills, hooks, workflows) is
 # installer output — reinstalled per-machine with the pack's ./install.sh —

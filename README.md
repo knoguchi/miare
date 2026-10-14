@@ -47,6 +47,31 @@ miare --help
 歌詞、反復記号、強弱など、まだ出力へ保持できない要素を検出した場合は停止する。
 内容を確認したうえで省略を許可する場合に限り、`--allow-lossy-input`を指定する。
 
+## ブラウザで聴く
+
+`score_viewer.html`は、編曲をブラウザ上で表示し再生する単一ファイルのビューアである。
+ビルド手順も追加の依存関係もない。リポジトリ直下でHTTPサーバを起動して開く。
+
+```console
+python3 -m http.server
+open http://localhost:8000/score_viewer.html
+```
+
+`samples/`の見本は一覧から1クリックで開く。左に原曲、右に編曲が並び、
+1つのトランスポートが両方を同じ小節で再生する。自分のファイルは
+`.musicxml`を、フレーズ境界を重ねる場合はその`.miare.json`も一緒に、
+ページへドラッグ&ドロップする。
+
+再生音はMusicXMLから合成する。録音ファイルもMIDI書き出しも不要である。
+編曲出力には`<sound tempo>`が無いため、テンポはページ側で指定する。
+
+見本は編曲器を変更したあとに作り直す。
+
+```console
+./scripts/make-samples.sh                # すべて
+./scripts/make-samples.sh greensleeves   # 1つだけ
+```
+
 ## 現在の範囲
 
 - `score-partwise` MusicXML
