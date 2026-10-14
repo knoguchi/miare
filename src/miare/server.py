@@ -23,6 +23,7 @@ This runs arbitrary user files through a parser, so it is not a service:
 from __future__ import annotations
 
 import json
+import subprocess
 import tempfile
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -41,6 +42,53 @@ MAX_BODY_BYTES = 10 * 1024 * 1024        # a MusicXML score is kilobytes; 10 MB 
 
 
 POSTED_NAME = "posted.musicxml"
+
+
+def _stale_against() -> str | None:
+    """The commit on disk now, when it differs from the one this process is running.
+
+    None when they match, when git is unavailable, or when the tree moved for any other
+    reason — a false "restart me" is worse than silence.
+    """
+    if _LAUNCHED_COMMIT is None:
+        return None
+    try:
+        current = subprocess.run(
+            ["git", "-C", str(Path(__file__).resolve().parent), "rev-parse", "--short", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        ).stdout.strip()
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return current if current and current != _LAUNCHED_COMMIT else None
+
+
+def _launched_commit() -> str | None:
+    """The commit this process started from, resolved once at import.
+
+    Python does not reload edited modules, so a server left running across a `git pull`
+    keeps serving the old code and reporting old errors — with nothing on the page to
+    say so. `__version__` cannot show this: it is a release string and does not move
+    between commits. This does, so the viewer can tell the user to restart.
+    """
+    return _LAUNCHED_COMMIT
+
+
+try:
+    _LAUNCHED_COMMIT: str | None = (
+        subprocess.run(
+            ["git", "-C", str(Path(__file__).resolve().parent), "rev-parse", "--short", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        ).stdout.strip()
+        or None
+    )
+except (OSError, subprocess.SubprocessError):
+    _LAUNCHED_COMMIT = None                  # installed from a wheel, or no git — fine
 
 
 def _scrub(message: str, tmpdir: str) -> str:
@@ -184,6 +232,9 @@ class MiareHandler(SimpleHTTPRequestHandler):
     # to be silent there. So the server announces itself in the HTML it serves instead,
     # and the page reads the tag. /api/health stays for curl and the tests.
     API_MARKER = b'<meta name="miare-api" content="1">'
+    # Carries the commit this process launched from, so a page served by a server left
+    # running across a pull can say so instead of showing stale errors as if they were real.
+    STALE_HINT = b'<meta name="miare-commit" content="%s">'
     HEAD_TAG = b"<head>"
 
     def do_GET(self) -> None:                        # noqa: N802
@@ -197,6 +248,7 @@ class MiareHandler(SimpleHTTPRequestHandler):
                 {
                     "ok": True,
                     "miare_version": __version__,
+                    "commit": _launched_commit(),
                     "relationships": ["support", "countermelody"],
                     "profiles": sorted(PROFILES),
                 },
@@ -222,7 +274,11 @@ class MiareHandler(SimpleHTTPRequestHandler):
         # Keyed on the <head> tag, not on the marker's absence: the page's own source
         # mentions the marker in a comment, so an "already present?" check would see it
         # there and never inject the real tag.
-        html = html.replace(self.HEAD_TAG, self.HEAD_TAG + b"\n" + self.API_MARKER, 1)
+        tags = self.API_MARKER
+        stale_of = _stale_against()
+        if stale_of:
+            tags += b"\n" + self.STALE_HINT % stale_of.encode("ascii", "replace")
+        html = html.replace(self.HEAD_TAG, self.HEAD_TAG + b"\n" + tags, 1)
         self.send_response(HTTPStatus.OK)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(html)))

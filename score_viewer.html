@@ -493,6 +493,14 @@ let apiReady = false;
 
 function probeApi() {
   apiReady = !!document.querySelector('meta[name="miare-api"]');
+  /* Python does not reload edited modules, so a server left running across a pull keeps
+     answering with the old code. Without this the page shows errors that were fixed on
+     disk, and there is no way to tell that from a real failure. */
+  const stale = document.querySelector('meta[name="miare-commit"]');
+  if (stale) {
+    setStatus(`This server is running older code than the checkout `
+      + `(now ${stale.getAttribute('content')}). Restart it: make viewer`);
+  }
   showArrangeBar();
 }
 
@@ -968,6 +976,12 @@ $('samples').addEventListener('change', event => {
   if (event.target.value) openSample(event.target.value);
 });
 $('arrange').addEventListener('click', arrangeCurrent);
+/* Changing either control re-arranges, because a menu that silently does nothing until
+   you find the button reads as "support and countermelody produce the same thing".
+   Only after the first Arrange, so browsing the menu beforehand does not fire a request. */
+for (const id of ['relationship', 'seed']) {
+  $(id).addEventListener('change', () => { if (view.report) arrangeCurrent(); });
+}
 $('play').addEventListener('click', () => (playing ? pause() : play()));
 $('stop').addEventListener('click', stop);
 $('showHarmony').addEventListener('change', drawHarmony);
