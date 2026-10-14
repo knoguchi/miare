@@ -27,6 +27,7 @@ musical vocabulary and grammar as the reference. MusicXML in, two-voice score ou
 | `src/miare/generation.py` | builds the supporting voice |
 | `src/miare/counterpoint.py` | builds the countermelody voice (beam search) |
 | `src/miare/instruments.py` | instrument profiles (range, idiom) |
+| `src/miare/theory.py` | music-theory facts shared by analysis and generation — measure lookup, scale intervals |
 | `tests/` | pytest suite |
 | `DESIGN.md` | internal responsibilities, data model, processing order (Japanese) |
 | `PLAN.md` | product intent (Japanese) |

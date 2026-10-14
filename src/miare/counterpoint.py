@@ -17,6 +17,7 @@ from .ir import (
     SourceScore,
     fraction_text,
 )
+from .theory import measure_for_time, scale_intervals
 
 
 CONSONANT_INTERVAL_CLASSES = {0, 3, 4, 7, 8, 9}
@@ -269,13 +270,6 @@ def check_hard_constraints(
     return None
 
 
-def _measure_at(score: SourceScore, time: Fraction):
-    for measure in score.measures:
-        if measure.start <= time < measure.end:
-            return measure
-    return score.measures[-1]
-
-
 def _phrase_at(song: SongIR, time: Fraction):
     for phrase in song.phrases:
         if phrase.start <= time < phrase.end:
@@ -312,7 +306,7 @@ def _melody_anchor(song: SongIR, start: Fraction, end: Fraction) -> int | None:
 
 
 def _metric_strength(score: SourceScore, time: Fraction) -> float:
-    measure = _measure_at(score, time)
+    measure = measure_for_time(score, time)
     beat = Fraction(4, measure.beat_type)
     position = time - measure.start
     if position == 0:
@@ -512,12 +506,10 @@ def _harmony_context(
 
 
 def _tonal_pitch_classes(song: SongIR) -> set[int]:
-    intervals = (
-        (0, 2, 3, 5, 7, 8, 10)
-        if song.mode.startswith("min")
-        else (0, 2, 4, 5, 7, 9, 11)
-    )
-    return {(song.tonic_pc + interval) % 12 for interval in intervals}
+    return {
+        (song.tonic_pc + interval) % 12
+        for interval in scale_intervals(song.mode)
+    }
 
 
 def _candidate_pitches(
