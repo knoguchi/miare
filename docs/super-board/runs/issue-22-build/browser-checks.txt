@@ -1,0 +1,64 @@
+PASS [chromium] empty state visible
+PASS [chromium] no console errors on load
+PASS [chromium] samples listed — Samples…, greensleeves · countermelody, greensleeves · support, short-tune · countermelody, short-tune · support
+PASS [chromium] greensleeves countermelody offered
+PASS [chromium] two scores rendered — svg=2
+PASS [chromium] arrangement shows 2 parts — 25 measures · 2 parts · 191 notes
+PASS [chromium] side by side — a.x=16 b.x=808
+PASS [chromium] phrase markers drawn — count=6
+PASS [chromium] diagnostics shown — structural melody keeps 74 of 81 melody notes
+PASS [chromium] play toggles to Pause — Pause
+PASS [chromium] clock advances — 0:01 / 0:53
+PASS [chromium] playhead visible on both decks — {"playing":"Pause","clock":"0:01 / 0:53","bar":"measure 1","headA":"block","headB":"block","leftA":"227.021px","leftB":"280.629px"}
+PASS [chromium] measure readout — measure 1
+PASS [chromium] playhead moved — 227.021px → 280.091px
+PASS [chromium] both decks mark a measure — {"position":{"i":1,"f":0.25968253968253957},"a":{"left":"235.975px","width":"102.278px","shown":"block"},"b":{"left":"314.497px","width":"105.781px","shown":"block"},"headA":"280.091px","headB":"354.844px"}
+PASS [chromium] each deck marks the shared measure index — {"i":1,"f":0.25968253968253957,"geoA":236,"geoB":314,"markA":236,"markB":314}
+PASS [chromium] notes scheduled to the audio graph — count=11
+PASS [chromium] audio switched to left only — {"value":"a","audible":["a"]}
+PASS [chromium] audio switched to right only — b
+PASS [chromium] audio back to both — a,b
+PASS [chromium] stop resets — {"clock":"0:00 / 0:53","seek":"0","label":"Play"}
+PASS [chromium] dropped file replaced the right deck — source.musicxml, dropped.musicxml
+PASS [chromium] no errors overall
+PASS [chromium] transport disabled with nothing open — {"play":true,"audio":true,"tempo":true}
+PASS [chromium] short-tune opens both scores — 8 measures · 1 part · 30 notes | 8 measures · 2 parts · 62 notes
+PASS [chromium] phrases marked on both decks — {"a":2,"b":2}
+PASS [chromium] click a measure seeks there — {"i":4,"clock":"0:08 / 0:17"}
+PASS [chromium] plays the right deck only — {"audible":["b"],"scheduled":6,"playing":true}
+PASS [chromium] dropped pair renders with its phrases — {"names":["source.musicxml","elsewhere.musicxml"],"phrasesB":6,"diag":"support.musicxml\nstructural melody keeps 30 of 30 melody notes\n2 phrases\nprimary"}
+PASS [chromium] a non-score file is refused by name — notes.txt: only .musicxml and .miare.json open here.
+PASS [chromium] broken MusicXML reports a reason — Could not read broken.musicxml: not readable as XML
+PASS [chromium] no page errors
+PASS [webkit] empty state visible
+PASS [webkit] no console errors on load
+PASS [webkit] samples listed — Samples…, greensleeves · countermelody, greensleeves · support, short-tune · countermelody, short-tune · support
+PASS [webkit] greensleeves countermelody offered
+PASS [webkit] two scores rendered — svg=2
+PASS [webkit] arrangement shows 2 parts — 25 measures · 2 parts · 191 notes
+PASS [webkit] side by side — a.x=16 b.x=808
+PASS [webkit] phrase markers drawn — count=6
+PASS [webkit] diagnostics shown — structural melody keeps 74 of 81 melody notes
+PASS [webkit] play toggles to Pause — Pause
+PASS [webkit] clock advances — 0:01 / 0:53
+PASS [webkit] playhead visible on both decks — {"playing":"Pause","clock":"0:01 / 0:53","bar":"measure 1","headA":"block","headB":"block","leftA":"226.910904px","leftB":"280.175888px"}
+PASS [webkit] measure readout — measure 1
+PASS [webkit] playhead moved — 226.910904px → 279.540436px
+PASS [webkit] both decks mark a measure — {"position":{"i":1,"f":0.25832804232804224},"a":{"left":"235.975398px","width":"102.277585px","shown":"block"},"b":{"left":"314.497345px","width":"105.780802px","shown":"block"},"headA":"279.540436px","headB":"354.391388px"}
+PASS [webkit] each deck marks the shared measure index — {"i":1,"f":0.25832804232804224,"geoA":236,"geoB":314,"markA":236,"markB":314}
+PASS [webkit] notes scheduled to the audio graph — count=11
+PASS [webkit] audio switched to left only — {"value":"a","audible":["a"]}
+PASS [webkit] audio switched to right only — b
+PASS [webkit] audio back to both — a,b
+PASS [webkit] stop resets — {"clock":"0:00 / 0:53","seek":"0","label":"Play"}
+PASS [webkit] dropped file replaced the right deck — source.musicxml, dropped.musicxml
+PASS [webkit] no errors overall
+PASS [webkit] transport disabled with nothing open — {"play":true,"audio":true,"tempo":true}
+PASS [webkit] short-tune opens both scores — 8 measures · 1 part · 30 notes | 8 measures · 2 parts · 62 notes
+PASS [webkit] phrases marked on both decks — {"a":2,"b":2}
+PASS [webkit] click a measure seeks there — {"i":4,"clock":"0:08 / 0:17"}
+PASS [webkit] plays the right deck only — {"audible":["b"],"scheduled":6,"playing":true}
+PASS [webkit] dropped pair renders with its phrases — {"names":["source.musicxml","elsewhere.musicxml"],"phrasesB":6,"diag":"support.musicxml\nstructural melody keeps 30 of 30 melody notes\n2 phrases\nprimary"}
+PASS [webkit] a non-score file is refused by name — notes.txt: only .musicxml and .miare.json open here.
+PASS [webkit] broken MusicXML reports a reason — Could not read broken.musicxml: not readable as XML
+PASS [webkit] no page errors
