@@ -44,11 +44,13 @@ All source is in `src/miare/` (flat package, no sub-packages).
 | `generation.py` | `relationship="support"`: `generate_support_voice` scores candidate pitches per harmonic slice; `validate_arrangement` enforces hard constraints (range, positive duration, monophony); entry point `arrange_support`. |
 | `counterpoint.py` | `relationship="countermelody"`: beam search over `CounterpointSlot`s. `build_counterpoint_plan` → `CounterpointPlan` (spans with `identity_policy`, texture, motif signature); `_score_action` holds the critic weights and the hard rules; `generate_counterpoint_candidates` runs the beam; entry point `arrange_countermelody`. Largest module (~1050 lines). |
 | `instruments.py` | `PROFILES` dict (violin, viola, cello, flute, bassoon) + `get_profile`. Ranges, preferred ranges, clef. `generated_from_source` maps source notes into an instrument's register (phrase-coherent octave displacement, Viterbi). |
-| `theory.py` | Music-theory facts both `analysis.py` and `counterpoint.py` need, one copy each: `measure_for_time` (the measure whose half-open span holds a time) and `scale_intervals` (semitone offsets above the tonic). Pure; imports only `ir`. Voice-leading rules are not here — those belong in `constraints.py`. |
+| `theory.py` | Music-theory facts both `analysis.py` and `counterpoint.py` need, one copy each: `measure_for_time` (the measure whose half-open span holds a time) and `scale_intervals` (semitone offsets above the tonic). Pure; imports only `ir`. Voice-leading rules are not here — those live in `constraints.py`. |
+| `constraints.py` | DESIGN.md §17 `constraints`. The voice-leading rules `generation.py` and `counterpoint.py` both need, one copy each. Hard constraints (DESIGN.md §3.5: a violation blocks output) — `is_leap_over_octave`, `is_parallel_perfect`, `PERFECT_INTERVAL_CLASSES`. Preferences (ranked, never blocking) — `is_contrary_motion` + `CONTRARY_MOTION_BONUS`, `is_voice_crossing` + `VOICE_CROSSING_PENALTY`. Owns the predicates and weights, not the control flow: each generator keeps its own way of acting on a violation (a `Rejection` from the beam's gate, `float("-inf")` pruned by the support DP's gate). Pure leaf; imports nothing from the package. |
 | `cli.py` | argparse front end: `analyze`, `arrange`, `inspect`. Also owns MuseScore `.mscz`/`.mscx` conversion shims and the JSON report writer. |
 | `__main__.py` | `python3 -m miare` shim. |
 
-Tests: `tests/test_theory.py` (key/chord/cadence/phrase/structural-melody units),
+Tests: `tests/test_constraints.py` (shared voice-leading rules + anti-drift guards),
+`tests/test_theory.py` (key/chord/cadence/phrase/structural-melody units),
 `tests/test_voice_leading.py` (counterpoint and support voice-leading rules),
 `tests/test_pipeline.py` (end-to-end parse → analyze → arrange → round-trip, CLI,
 determinism). Fixtures: `tests/fixtures/simple_melody.musicxml`, `minor_melody.musicxml`.
