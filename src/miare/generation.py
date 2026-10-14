@@ -3,7 +3,7 @@ from __future__ import annotations
 from fractions import Fraction
 from random import Random
 
-from .instruments import get_profile
+from .instruments import generated_from_source, get_profile
 from .ir import (
     ArrangementIR,
     GeneratedEvent,
@@ -14,7 +14,6 @@ from .ir import (
     SongIR,
     SourceScore,
 )
-from .musicxml import generated_from_source
 
 
 def _planning_melody(song: SongIR) -> list:

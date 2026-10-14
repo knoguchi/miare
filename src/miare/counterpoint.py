@@ -6,7 +6,7 @@ from math import log1p
 from random import Random
 from typing import Any
 
-from .instruments import get_profile
+from .instruments import generated_from_source, get_profile
 from .ir import (
     ArrangementIR,
     GeneratedEvent,
@@ -17,7 +17,6 @@ from .ir import (
     SourceScore,
     fraction_text,
 )
-from .musicxml import generated_from_source
 
 
 CONSONANT_INTERVAL_CLASSES = {0, 3, 4, 7, 8, 9}

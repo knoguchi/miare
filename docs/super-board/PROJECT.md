@@ -39,11 +39,11 @@ All source is in `src/miare/` (flat package, no sub-packages).
 | Module | Responsibility |
 | --- | --- |
 | `ir.py` | All dataclasses: `Pitch`, `Event`, `Measure`, `Part`, `SourceScore`, `Phrase`, `HarmonyCandidate`, `HarmonicSlice`, `MusicalLanguage`, `SongIR`, `GeneratedEvent`, `InstrumentProfile`, `OutputVoice`, `ArrangementIR`, plus `to_jsonable` / `fraction_text`. No I/O, no music logic. |
-| `musicxml.py` | Only module that touches XML. `parse_musicxml` → `SourceScore`; `write_arrangement` → MusicXML; `validate_round_trip` re-parses output and compares; `generated_from_source` maps source notes into an instrument's register; `_duration_notation` maps `Fraction` durations to note type/dots/time-modification. |
+| `musicxml.py` | Only module that touches XML. `parse_musicxml` → `SourceScore`; `write_arrangement` → MusicXML; `validate_round_trip` re-parses output and compares; `_duration_notation` maps `Fraction` durations to note type/dots/time-modification. |
 | `analysis.py` | `SourceScore` → `SongIR`. Key inference (Krumhansl profiles), `select_melody`, `detect_phrases`, `infer_harmony` (chord vocabulary + transition scoring), `refine_phrases_with_harmony`, `extract_musical_language`, `reduce_to_structural_melody`. Entry point: `analyze_score`. |
 | `generation.py` | `relationship="support"`: `generate_support_voice` scores candidate pitches per harmonic slice; `validate_arrangement` enforces hard constraints (range, positive duration, monophony); entry point `arrange_support`. |
 | `counterpoint.py` | `relationship="countermelody"`: beam search over `CounterpointSlot`s. `build_counterpoint_plan` → `CounterpointPlan` (spans with `identity_policy`, texture, motif signature); `_score_action` holds the critic weights and the hard rules; `generate_counterpoint_candidates` runs the beam; entry point `arrange_countermelody`. Largest module (~1050 lines). |
-| `instruments.py` | `PROFILES` dict (violin, viola, cello, flute, bassoon) + `get_profile`. Ranges, preferred ranges, clef. |
+| `instruments.py` | `PROFILES` dict (violin, viola, cello, flute, bassoon) + `get_profile`. Ranges, preferred ranges, clef. `generated_from_source` maps source notes into an instrument's register (phrase-coherent octave displacement, Viterbi). |
 | `cli.py` | argparse front end: `analyze`, `arrange`, `inspect`. Also owns MuseScore `.mscz`/`.mscx` conversion shims and the JSON report writer. |
 | `__main__.py` | `python3 -m miare` shim. |
 
