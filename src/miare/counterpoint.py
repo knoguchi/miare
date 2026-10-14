@@ -24,6 +24,53 @@ CONSONANT_INTERVAL_CLASSES = {0, 3, 4, 7, 8, 9}
 PERFECT_INTERVAL_CLASSES = {0, 7}
 
 
+# The eight critics of DESIGN.md §9.5, in the order the scorer runs them. Each
+# name is the breakdown key its critic owns; nothing else may write that key.
+CRITIC_NAMES: tuple[str, ...] = (
+    "melody",
+    "counterpoint",
+    "harmony",
+    "phrase",
+    "source_language",
+    "source_identity",
+    "instrument",
+    "lookahead",
+)
+
+# DESIGN.md §11.3: the weights change with the voice relationship. One multiplier
+# per critic, applied to everything that critic contributes. `countermelody` is
+# all 1.0, which is what the coefficients in this module already meant, so the
+# arrangement it produces is unchanged.
+#
+# `support` and `equal` are listed because §11.3 names them: `support` leans on
+# the principal melody staying clear, `equal` on voice independence. Only the
+# three extracted critics read these today — the five still inline in
+# `_score_action` ignore them until #4b moves them out.
+CRITIC_WEIGHTS: dict[str, dict[str, float]] = {
+    "countermelody": {name: 1.0 for name in CRITIC_NAMES},
+    "support": {**{name: 1.0 for name in CRITIC_NAMES}, "source_identity": 1.4},
+    "equal": {**{name: 1.0 for name in CRITIC_NAMES}, "counterpoint": 1.4},
+}
+
+DEFAULT_RELATIONSHIP = "countermelody"
+
+
+def critic_weights(relationship: str) -> dict[str, float]:
+    """The per-critic multipliers for a voice relationship.
+
+    An unknown relationship is a programming error, not a degraded arrangement:
+    silently falling back to `countermelody` weights would make a `--relationship`
+    typo produce a plausible-looking score.
+    """
+    try:
+        return CRITIC_WEIGHTS[relationship]
+    except KeyError:
+        raise ValueError(
+            f"no critic weights for relationship {relationship!r}; "
+            f"known relationships are {sorted(CRITIC_WEIGHTS)}"
+        ) from None
+
+
 @dataclass(frozen=True)
 class CounterpointConfig:
     beam_width: int = 32
@@ -31,6 +78,7 @@ class CounterpointConfig:
     lookback_quarters: Fraction = Fraction(8)
     lookahead_quarters: Fraction = Fraction(8)
     seed: int = 1
+    relationship: str = DEFAULT_RELATIONSHIP
 
 
 @dataclass(frozen=True)
@@ -656,6 +704,261 @@ def _build_slot_context(
     )
 
 
+
+@dataclass(frozen=True)
+class CriticInput:
+    """Everything a critic may look at to judge one candidate pitch.
+
+    One object instead of nine arguments: the critics read overlapping subsets
+    of it, and threading nine positional parameters through every stage made
+    the signature the longest thing in each method.
+
+    `midi is None` is a rest. A rest is a real candidate — `CounterpointCritic`
+    scores it — so critics check for it rather than assuming a pitch.
+    """
+
+    song: SongIR
+    profile: InstrumentProfile
+    config: CounterpointConfig
+    slot: CounterpointSlot
+    state: BeamState
+    midi: int | None
+    context: SlotContext
+    candidate: CandidateContext
+
+
+@dataclass
+class CriticScore:
+    """One critic's verdict on one candidate: the terms it awarded for its own
+    breakdown key, plus the reasons that earned them.
+
+    A critic never touches another critic's key and never sees the shared
+    breakdown dict, so a unit test can call it on a hand-built slot and read
+    the arithmetic straight off the result.
+
+    `terms` stays an ordered list rather than a running total because float
+    addition is not associative: summing a critic's terms and then adding the
+    subtotal to the bucket moves the bucket's last bits, and the beam search
+    sorts on those sums. The scorer adds the terms to the bucket one at a time,
+    in the order they were awarded — bit-for-bit what the inline block did.
+    """
+
+    terms: list[float] = field(default_factory=list)
+    reasons: list[str] = field(default_factory=list)
+
+    @property
+    def value(self) -> float:
+        """The contribution as one number, for callers that do not accumulate
+        into a shared bucket."""
+        total = 0.0
+        for term in self.terms:
+            total += term
+        return total
+
+    def add(self, value: float, reason: str | None = None) -> None:
+        self.terms.append(value)
+        if reason is not None:
+            self.reasons.append(reason)
+
+    def extend(self, other: CriticScore) -> None:
+        self.terms.extend(other.terms)
+        self.reasons.extend(other.reasons)
+
+
+class Critic:
+    """One of the eight evaluators of DESIGN.md §9.5.
+
+    `name` is the breakdown key the critic owns; it writes no other. `weight`
+    is its multiplier for the current voice relationship (DESIGN.md §11.3),
+    applied to each term as it is awarded, so `countermelody`'s 1.0 is an exact
+    no-op and the arrangement it produces is bit-for-bit unchanged.
+
+    Subclasses list their `stages` — the ordered pieces of their arithmetic,
+    each a `_<stage>` method. The scorer runs stages one at a time, which keeps
+    all eight critics' reasons in the order they were written in; `score()`
+    runs the whole critic at once, which is what a unit test wants.
+    """
+
+    name: str
+    stages: tuple[str, ...]
+
+    def __init__(self, weights: dict[str, float]) -> None:
+        self.weight = weights[self.name]
+
+    def stage(self, name: str, data: CriticInput) -> CriticScore:
+        """One named stage's weighted contribution."""
+        result = CriticScore()
+        getattr(self, f"_{name}")(result, data)
+        if self.weight != 1.0:
+            result.terms = [term * self.weight for term in result.terms]
+        return result
+
+    def score(self, data: CriticInput) -> CriticScore:
+        """Every stage in order — the critic's whole verdict on a candidate."""
+        total = CriticScore()
+        for name in self.stages:
+            total.extend(self.stage(name, data))
+        return total
+
+
+class MelodyCritic(Critic):
+    """Is the counterline a good tune in its own right? Step over leap, every
+    big leap recovered, no pitch worn out and no contour that climbs forever.
+
+    Reads only the candidate's own line. How it sits against the primary
+    melody is `CounterpointCritic`'s business.
+    """
+
+    name = "melody"
+    stages = ("contour", "repetition")
+
+    def _contour(self, score: CriticScore, data: CriticInput) -> None:
+        if data.midi is None or data.state.previous_midi is None:
+            return
+        motion = data.candidate.motion
+        leap = abs(motion)
+        if leap <= 2:
+            score.add(1.2, "stepwise counterline motion")
+        elif leap <= 5:
+            score.add(0.7)
+        elif leap > 7:
+            score.add(-1.3)
+        if abs(data.state.last_motion) > 7:
+            if motion * data.state.last_motion < 0 and abs(motion) <= 4:
+                score.add(1.4, "recovered previous leap")
+            else:
+                score.add(-2.0)
+
+    def _repetition(self, score: CriticScore, data: CriticInput) -> None:
+        midi = data.midi
+        if midi is None:
+            return
+        recent = _recent_pitches(
+            data.state, data.slot.start, data.config.lookback_quarters
+        )
+        if recent.count(midi) >= 3:
+            score.add(-1.0)
+        if recent and max(recent + [midi]) - min(recent + [midi]) > 19:
+            score.add(-0.6)
+        if len(recent) >= 4:
+            recent_motions = [
+                right - left for left, right in zip(recent[-4:], recent[-3:])
+            ]
+            projected = [*recent_motions, midi - recent[-1]]
+            nonzero_directions = [1 if item > 0 else -1 for item in projected if item]
+            if (
+                len(nonzero_directions) >= 4
+                and len(set(nonzero_directions[-4:])) == 1
+            ):
+                score.add(-1.6, "overlong one-direction contour penalty")
+
+
+class CounterpointCritic(Critic):
+    """How the candidate behaves against the primary melody: dissonance
+    obligations, relative motion, spacing and voice crossing.
+
+    A rest is scored here too — silence under an active melody is a
+    counterpoint choice, not the absence of one.
+    """
+
+    name = "counterpoint"
+    stages = ("rest", "dissonance", "relative_motion", "spacing")
+
+    def _rest(self, score: CriticScore, data: CriticInput) -> None:
+        if data.midi is not None:
+            return
+        if data.slot.melody_activity >= 2:
+            score.add(0.8, "rests under active primary melody")
+        elif data.state.rest_run:
+            score.add(-1.2)
+        else:
+            score.add(-0.25)
+
+    def _dissonance(self, score: CriticScore, data: CriticInput) -> None:
+        if data.midi is None:
+            return
+        if data.state.pending_resolution is not None:
+            score.add(2.0, "resolved carried dissonance obligation")
+        elif not data.candidate.consonant:
+            if data.candidate.strong:
+                # A held consonance becoming dissonant acts as a suspension.
+                score.add(0.5, "prepared suspension; downward resolution required")
+            else:
+                score.add(0.4, "stepwise weak-beat dissonance; continuation required")
+
+    def _relative_motion(self, score: CriticScore, data: CriticInput) -> None:
+        state = data.state
+        if (
+            data.midi is None
+            or data.context.melody_midi is None
+            or state.previous_melody is None
+            or state.previous_midi is None
+        ):
+            return
+        melody_motion = data.context.melody_midi - state.previous_melody
+        motion = data.candidate.motion
+        if melody_motion * motion < 0:
+            score.add(1.1, "contrary motion")
+        elif melody_motion == 0 or motion == 0:
+            score.add(0.45, "oblique motion")
+        elif melody_motion * motion > 0:
+            score.add(-0.2)
+
+    def _spacing(self, score: CriticScore, data: CriticInput) -> None:
+        midi, melody = data.midi, data.context.melody_midi
+        if midi is None or melody is None:
+            return
+        spacing = data.candidate.spacing
+        if 3 <= spacing <= 19:
+            score.add(0.7)
+        elif midi >= melody:
+            score.add(-3.0, "voice-crossing penalty")
+        if data.candidate.interval_class == 0 and not data.slot.cadence:
+            score.add(-1.4)
+        if data.candidate.strong and data.candidate.consonant:
+            score.add(0.8)
+
+
+class HarmonyCritic(Critic):
+    """Does the pitch fit what is actually sounding and what the harmony
+    analysis inferred? Existing source voices outrank the inferred chord: they
+    are evidence, the chord is a guess.
+    """
+
+    name = "harmony"
+    stages = ("pitch_class_support",)
+
+    def _pitch_class_support(self, score: CriticScore, data: CriticInput) -> None:
+        if data.midi is None:
+            return
+        pitch_class = data.midi % 12
+        source_pcs = data.context.source_pcs
+        if pitch_class in source_pcs:
+            score.add(1.7, "pitch class supported by existing source voices")
+        elif source_pcs:
+            score.add(-1.2)
+        if pitch_class in data.context.harmony_pcs:
+            score.add(0.7)
+        elif not source_pcs:
+            score.add(-0.25)
+
+
+def build_critics(relationship: str) -> dict[str, Critic]:
+    """The extracted critics for a voice relationship, keyed by breakdown key.
+
+    The five critics still inline in `_score_action` are absent; #4b adds them.
+    """
+    weights = critic_weights(relationship)
+    return {
+        critic.name: critic
+        for critic in (
+            MelodyCritic(weights),
+            CounterpointCritic(weights),
+            HarmonyCritic(weights),
+        )
+    }
+
+
 def _score_action(
     song: SongIR,
     profile: InstrumentProfile,
@@ -666,22 +969,21 @@ def _score_action(
     context: SlotContext,
     candidate: CandidateContext,
     rng: Random,
+    critics: dict[str, Critic] | None = None,
 ) -> tuple[CounterpointAction, BeamState]:
     """Score a candidate the hard-constraint gate has already passed.
 
     Preference arithmetic only. Callers run `check_hard_constraints` first;
     this function never rejects, so every candidate reaching it is playable.
+
+    Three of DESIGN.md §9.5's eight critics — melody, counterpoint, harmony —
+    are objects now; the other five are still the inline blocks below, and #4b
+    moves them. A stage of an extracted critic runs where its arithmetic used
+    to sit, so every critic's reasons stay in the order they were written in.
     """
-    breakdown = {
-        "melody": 0.0,
-        "counterpoint": 0.0,
-        "harmony": 0.0,
-        "phrase": 0.0,
-        "source_language": 0.0,
-        "source_identity": 0.0,
-        "instrument": 0.0,
-        "lookahead": 0.0,
-    }
+    if critics is None:
+        critics = build_critics(config.relationship)
+    breakdown = {name: 0.0 for name in CRITIC_NAMES}
     reasons: list[str] = []
     melody_midi = context.melody_midi
     source_pcs = context.source_pcs
@@ -690,14 +992,25 @@ def _score_action(
     harmony_pcs = context.harmony_pcs
     harmony_root = context.harmony_root
 
+    data = CriticInput(
+        song=song,
+        profile=profile,
+        config=config,
+        slot=slot,
+        state=state,
+        midi=midi,
+        context=context,
+        candidate=candidate,
+    )
+
+    def run(critic_name: str, stage_name: str) -> None:
+        result = critics[critic_name].stage(stage_name, data)
+        for term in result.terms:
+            breakdown[critic_name] += term
+        reasons.extend(result.reasons)
+
     if midi is None:
-        if slot.melody_activity >= 2:
-            breakdown["counterpoint"] += 0.8
-            reasons.append("rests under active primary melody")
-        elif state.rest_run:
-            breakdown["counterpoint"] -= 1.2
-        else:
-            breakdown["counterpoint"] -= 0.25
+        run("counterpoint", "rest")
         if slot.identity_policy == "protected":
             breakdown["source_identity"] += 1.4 * slot.structural_importance
             reasons.append("space reserved for protected thematic material")
@@ -726,78 +1039,32 @@ def _score_action(
     motion = candidate.motion
 
     pending_resolution: int | None = None
-    if state.pending_resolution is not None:
-        breakdown["counterpoint"] += 2.0
-        reasons.append("resolved carried dissonance obligation")
-    elif not consonant:
-        if strong:
-            # A held consonance becoming dissonant acts as a suspension.
-            pending_resolution = -1
-            breakdown["counterpoint"] += 0.5
-            reasons.append("prepared suspension; downward resolution required")
-        else:
-            pending_resolution = 1 if motion > 0 else -1
-            breakdown["counterpoint"] += 0.4
-            reasons.append("stepwise weak-beat dissonance; continuation required")
+    if state.pending_resolution is None and not consonant:
+        # The obligation the dissonance creates is beam state, not a score, so
+        # it stays here while `CounterpointCritic` scores the dissonance.
+        pending_resolution = -1 if strong else (1 if motion > 0 else -1)
+    run("counterpoint", "dissonance")
 
-    if state.previous_midi is not None:
-        leap = abs(motion)
-        if leap <= 2:
-            breakdown["melody"] += 1.2
-            reasons.append("stepwise counterline motion")
-        elif leap <= 5:
-            breakdown["melody"] += 0.7
-        elif leap > 7:
-            breakdown["melody"] -= 1.3
-        if abs(state.last_motion) > 7:
-            if motion * state.last_motion < 0 and abs(motion) <= 4:
-                breakdown["melody"] += 1.4
-                reasons.append("recovered previous leap")
-            else:
-                breakdown["melody"] -= 2.0
-
-    if melody_midi is not None and state.previous_melody is not None and state.previous_midi is not None:
-        melody_motion = melody_midi - state.previous_melody
-        if melody_motion * motion < 0:
-            breakdown["counterpoint"] += 1.1
-            reasons.append("contrary motion")
-        elif melody_motion == 0 or motion == 0:
-            breakdown["counterpoint"] += 0.45
-            reasons.append("oblique motion")
-        elif melody_motion * motion > 0:
-            breakdown["counterpoint"] -= 0.2
+    run("melody", "contour")
+    run("counterpoint", "relative_motion")
 
     if melody_midi is not None:
         spacing = candidate.spacing
-        if 3 <= spacing <= 19:
-            breakdown["counterpoint"] += 0.7
-        elif midi >= melody_midi:
-            breakdown["counterpoint"] -= 3.0
-            reasons.append("voice-crossing penalty")
+        run("counterpoint", "spacing")
+        if not 3 <= spacing <= 19 and midi >= melody_midi:
             # The gate already rejected a crossing a protected phrase could
             # have avoided, so any crossing left here is forced by the floor.
             breakdown["source_identity"] -= 1.2
             reasons.append("crossing unavoidable near instrument floor")
-        if interval_class == 0 and not slot.cadence:
-            breakdown["counterpoint"] -= 1.4
-        if strong and consonant:
-            breakdown["counterpoint"] += 0.8
         if 5 <= spacing <= 16:
             breakdown["source_identity"] += 1.0 * slot.structural_importance
             reasons.append("principal melody kept perceptually separate")
         if slot.melody_activity >= 2 and slot.identity_policy == "protected":
             breakdown["source_identity"] -= 0.9
 
+    run("harmony", "pitch_class_support")
     if midi % 12 in source_pcs:
-        breakdown["harmony"] += 1.7
-        reasons.append("pitch class supported by existing source voices")
         breakdown["source_identity"] += 0.8 * slot.structural_importance
-    elif source_pcs:
-        breakdown["harmony"] -= 1.2
-    if midi % 12 in harmony_pcs:
-        breakdown["harmony"] += 0.7
-    elif not source_pcs:
-        breakdown["harmony"] -= 0.25
     if harmony_root is not None and slot.cadence and midi % 12 == harmony_root:
         breakdown["phrase"] += 1.5
         reasons.append("cadential harmonic root")
@@ -838,25 +1105,7 @@ def _score_action(
     else:
         breakdown["instrument"] -= 0.8
 
-    recent = _recent_pitches(state, slot.start, config.lookback_quarters)
-    if recent.count(midi) >= 3:
-        breakdown["melody"] -= 1.0
-    if recent and max(recent + [midi]) - min(recent + [midi]) > 19:
-        breakdown["melody"] -= 0.6
-    if len(recent) >= 4:
-        recent_motions = [
-            right - left for left, right in zip(recent[-4:], recent[-3:])
-        ]
-        projected = [*recent_motions, midi - recent[-1]]
-        nonzero_directions = [
-            1 if item > 0 else -1 for item in projected if item
-        ]
-        if (
-            len(nonzero_directions) >= 4
-            and len(set(nonzero_directions[-4:])) == 1
-        ):
-            breakdown["melody"] -= 1.6
-            reasons.append("overlong one-direction contour penalty")
+    run("melody", "repetition")
 
     future_melody = context.future_melody
     if future_melody is not None:
@@ -973,6 +1222,7 @@ def generate_counterpoint_candidates(
         raise ValueError("counterpoint generation requires at least one phrase")
     plan = build_counterpoint_plan(source, song, config)
     rng = Random(config.seed)
+    critics = build_critics(config.relationship)
     beam = [BeamState()]
     contexts = {
         slot.index: _build_slot_context(source, song, profile, slot, config)
@@ -1005,6 +1255,7 @@ def generate_counterpoint_candidates(
                         context,
                         candidate,
                         rng,
+                        critics,
                     )
                     expanded_states.append(new_state)
             return expanded_states
@@ -1092,6 +1343,7 @@ def arrange_countermelody(
         lookback_quarters=context,
         lookahead_quarters=context,
         seed=seed,
+        relationship="countermelody",
     )
     melody_events, melody_diagnostics = generated_from_source(
         song.melody,
