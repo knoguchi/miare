@@ -29,7 +29,7 @@ musical vocabulary and grammar as the reference. MusicXML in, two-voice score ou
 | `src/miare/instruments.py` | instrument profiles (range, idiom) |
 | `src/miare/theory.py` | music-theory facts shared by analysis and generation — measure lookup, scale intervals |
 | `src/miare/constraints.py` | voice-leading rules both generators read — hard constraints (leap limit, parallel perfects) and preference weights (contrary motion, voice crossing) |
-| `score_viewer.html` | single-file browser viewer: renders a source and an arrangement side by side, plays both back as MIDI synthesized from the MusicXML. No build step, one CDN script (OpenSheetMusicDisplay) |
+| `score_viewer.html` | single-file browser viewer: renders one arrangement, plays it back as MIDI synthesized from the MusicXML, and can mute down to a single part. No build step, one CDN script (OpenSheetMusicDisplay) |
 | `samples/<name>/` | the viewer's demo set — a committed `source.musicxml` plus the arrangements and `.miare.json` reports `scripts/make-samples.sh` writes beside it |
 | `scripts/make-samples.sh` | regenerates `samples/` from its committed sources; run it after an arranger change |
 | `tests/` | pytest suite |
