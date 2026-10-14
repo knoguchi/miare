@@ -312,3 +312,31 @@ def test_the_api_can_opt_into_lossy_input(base_url: str, tmp_path: Path) -> None
     )
     assert allowed == 200
     assert payload["musicxml"]
+
+
+def test_support_and_countermelody_are_not_the_same_arrangement(base_url: str) -> None:
+    """A user reported the two relationships looked identical.
+
+    They were not — the viewer's menu simply did not re-arrange on change, so the score
+    on screen stayed whatever was last generated. Guarding the engine side here: for one
+    source and one seed, the two must produce materially different second voices.
+    """
+    source = (REPO_ROOT / "samples" / "greensleeves" / "source.musicxml").read_bytes()
+    voices = {}
+    for relationship in ("support", "countermelody"):
+        status, payload = post(
+            f"{base_url}/api/arrange?relationship={relationship}&seed=1", source
+        )
+        assert status == 200
+        root = ElementTree.fromstring(payload["musicxml"])
+        generated = root.findall("part")[1]
+        voices[relationship] = [
+            (note.find("pitch/step").text, note.find("pitch/octave").text)
+            for note in generated.iter("note")
+            if note.find("pitch") is not None
+        ]
+    assert voices["support"] != voices["countermelody"]
+    assert len(voices["countermelody"]) > len(voices["support"]), (
+        "countermelody is the busier line by design; if it is not, the relationship "
+        "argument is probably being ignored"
+    )
