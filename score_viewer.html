@@ -128,6 +128,7 @@ body.drop main { outline: 3px dashed var(--pen); outline-offset: -8px; }
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.9/build/opensheetmusicdisplay.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
 <script>
 'use strict';
 
@@ -636,6 +637,27 @@ function updateAudioChoices() {
   if (!two) $('audio').value = 'both';
 }
 
+/* Recorded piano, not a synthesized approximation: MusyngKite's acoustic grand,
+   52 sampled notes delivered as base64 audio and played by soundfont-player.
+   The samples are ~2.3 MB, fetched once on the first Play and then cached by the
+   browser. Until they arrive the page falls back to the oscillator voice below,
+   so Play never blocks and an offline machine still gets sound. */
+const PIANO_NAME = 'acoustic_grand_piano';
+const PIANO_HOST = 'https://gleitz.github.io/midi-js-soundfonts/MusyngKite/';
+let piano = null;              // the loaded instrument, or null while loading / if it failed
+
+function loadPiano() {
+  if (piano || !window.Soundfont) return;
+  Soundfont.instrument(audio, PIANO_NAME, { soundfont: 'MusyngKite', nameToUrl:
+      (name, sf, format) => `${PIANO_HOST}${name}-${format === 'ogg' ? 'ogg' : 'mp3'}.js` })
+    .then(instrument => {
+      piano = instrument;
+      piano.out.connect(master);
+      setStatus('Piano samples ready.');
+    })
+    .catch(() => setStatus('Piano samples unavailable — using the fallback voice.'));
+}
+
 function play() {
   if (!loaded().length) return;
   audio = audio || new (window.AudioContext || window.webkitAudioContext)();
@@ -644,6 +666,7 @@ function play() {
     master.gain.value = 0.9;
     master.connect(audio.destination);
   }
+  loadPiano();
   audio.resume();
   if (offset >= totalSeconds() - 0.02) offset = 0;
   startedAt = audio.currentTime - offset;
@@ -690,6 +713,17 @@ function seek(seconds) {
 /* One note: a triangle oscillator through its own envelope. No soundfont to fetch,
    so the page works offline and on first load. */
 function sound(midi, at, seconds, gain) {
+  if (piano) {
+    /* soundfont-player schedules against the same AudioContext clock the rest of
+       the transport uses, so `at` needs no translation. */
+    const node = piano.play(midi, at, { duration: Math.max(0.08, seconds), gain });
+    if (node && typeof node.stop === 'function') {
+      voices.add(node);
+      if (typeof node.on === 'function') node.on('ended', () => voices.delete(node));
+    }
+    notesScheduled++;
+    return;
+  }
   const osc = audio.createOscillator();
   const env = audio.createGain();
   osc.type = 'triangle';
