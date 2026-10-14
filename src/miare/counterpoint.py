@@ -8,7 +8,7 @@ from typing import Any
 
 from .constraints import (
     CONTRARY_MOTION_BONUS,
-    PERFECT_INTERVAL_CLASSES,
+    PERFECT_INTERVAL_CLASSES,  # noqa: F401 — re-exported; test_constraints.py asserts both modules share this set
     VOICE_CROSSING_PENALTY,
     is_contrary_motion,
     is_leap_over_octave,
