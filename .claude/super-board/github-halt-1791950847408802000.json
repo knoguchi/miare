@@ -1,0 +1,1 @@
+{"reason": "GitHub required read failed; stopped after 3 failed attempts", "attempts": 3, "at": 1791950762, "operation": {"args": ["api", "repos/knoguchi/miare/pulls/23/files", "--paginate", "--slurp", "--jq", "[.[][] | .filename]"], "kind": "json", "meta": null}}

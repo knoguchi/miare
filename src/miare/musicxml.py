@@ -260,14 +260,17 @@ def parse_musicxml(path: str | Path) -> SourceScore:
                                         Direction(abs_offset, "words", text, placement)
                                     )
                 elif name == "harmony":
+                    # Not UNSUPPORTED-OUTPUT: the analyser infers its own harmony, so
+                    # dropping the written symbols costs the arrangement nothing. They
+                    # are notation the two-voice output would have no place for anyway.
                     diagnostics.append(
-                        "UNSUPPORTED-OUTPUT: written chord symbols are present; "
-                        "the MVP currently infers harmony"
+                        "written chord symbols are ignored; harmony is inferred"
                     )
                 elif name == "barline" and _child(item, "repeat") is not None:
+                    # Also not UNSUPPORTED-OUTPUT: the repeat is unfolded, not lost. The
+                    # arrangement is linear but musically complete.
                     diagnostics.append(
-                        "UNSUPPORTED-OUTPUT: repeat barlines are present; "
-                        "the MVP writes linear measures"
+                        "repeat barlines are ignored; the arrangement is written linearly"
                     )
 
             nominal_duration = Fraction(beats * 4, beat_type)

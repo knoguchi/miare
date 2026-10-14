@@ -92,9 +92,10 @@ def arrange_source(
     ]
     if unsupported and not allow_lossy_input:
         raise ValueError(
-            "input contains notation that cannot yet be preserved: "
+            "input contains notation that would be lost or mis-analysed: "
             + "; ".join(unsupported)
-            + ". Pass --allow-lossy-input to proceed explicitly"
+            + ". Arrange it anyway with --allow-lossy-input (CLI) or "
+            "allow_lossy_input=1 (API)"
         )
     song = analyze_score(score)
     if relationship == "support":

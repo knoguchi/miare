@@ -288,3 +288,27 @@ def test_the_server_writes_nothing_into_the_repo(base_url: str) -> None:
     assert status == 200
     appeared = _worktree_state() - before
     assert not appeared, f"the server left files behind: {sorted(appeared)}"
+
+
+def test_the_api_can_opt_into_lossy_input(base_url: str, tmp_path: Path) -> None:
+    """The browser has no CLI flag, so the API carries the same escape hatch.
+
+    Without it a score the CLI can arrange would dead-end in the viewer: refused, with
+    the error naming a flag there is no way to pass.
+    """
+    source = FIXTURE.read_text(encoding="utf-8").replace(
+        "<note>",
+        "<note><pitch><step>C</step><octave>4</octave></pitch></note>\n<note>",
+        1,
+    )
+    body = source.encode("utf-8")
+
+    refused, payload = post(f"{base_url}/api/arrange?relationship=support", body)
+    assert refused == 400
+    assert "allow_lossy_input=1" in payload["error"], payload["error"]
+
+    allowed, payload = post(
+        f"{base_url}/api/arrange?relationship=support&allow_lossy_input=1", body
+    )
+    assert allowed == 200
+    assert payload["musicxml"]

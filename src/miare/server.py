@@ -74,6 +74,14 @@ def _query_int(query: dict[str, list[str]], name: str, default: int) -> int:
         ) from None
 
 
+def _query_flag(query: dict[str, list[str]], name: str) -> bool:
+    """Present-and-not-false is true, so `?allow_lossy_input=1` and a bare `?x` both work."""
+    if name not in query:
+        return False
+    raw = (query[name][0] or "").strip().lower()
+    return raw not in {"0", "false", "no"}
+
+
 def _query_profile(query: dict[str, list[str]], name: str, default: str) -> str:
     value = query.get(name, [None])[0] or default
     if value not in PROFILES:
@@ -110,6 +118,9 @@ def run_arrange(body: bytes, query: dict[str, list[str]]) -> dict[str, Any]:
         "seed": _query_int(query, "seed", 1),
         "beam_width": _query_int(query, "beam_width", 32),
         "context_measures": _query_int(query, "context_measures", 2),
+        # The browser has no CLI flag, so without this a score the CLI can arrange would
+        # dead-end in the viewer with no way forward.
+        "allow_lossy_input": _query_flag(query, "allow_lossy_input"),
     }
     name = (query.get("name", [""])[0] or "dropped.musicxml").split("/")[-1]
     stem = name.rsplit(".", 1)[0] or "arrangement"
