@@ -1,0 +1,46 @@
+PASS [webkit] AC9 empty state tells you what to drop — visible=true len=770
+PASS [webkit] AC9 no console or page error on load — none
+PASS [webkit] AC9 not a blank screen — svg=0
+PASS [webkit] AC9 transport disabled with nothing open — {"play":true,"stop":true,"seek":true}
+PASS [webkit] AC5 bundled samples listed — greensleeves · countermelody, greensleeves · support, short-tune · countermelody, short-tune · support
+PASS [webkit] AC5 one click opened a sample, no file picking — source.musicxml | countermelody.musicxml
+PASS [webkit] AC1 score renders with OSMD — svgA=1 svgB=1
+PASS [webkit] AC1 arrangement shows both voices — 2 parts · 191 notes
+PASS [webkit] AC1 both voices carry notes and overlap in time — {"parts":[0,1],"simultaneous":true}
+PASS [webkit] AC6 decks render side by side — a.x=16 w=936 b.x=968
+PASS [webkit] AC8 phrase boundaries drawn from the .miare.json — a=6 b=6
+PASS [webkit] AC8 each phrase mark lands in its own measure — [{"i":0,"at":0,"idx":0,"left":197,"inBox":true},{"i":1,"at":12,"idx":4,"left":279,"inBox":true},{"i":2,"at":24,"idx":8,"left":307,"inBox":true},{"i":3,"at":36,"idx":12,"left":272,"inBox":true},{"i":4,"at":48,"idx":16,"left":253,"inBox":true},{"i":5,"at":60,"idx":20,"left":279,"inBox":true}]
+PASS [webkit] AC8 arrangement diagnostics surfaced — countermelody.musicxmlstructural melody keeps 74 of 81 melody notes6 phrasescounterpoint beam width=32, context=6 quarte
+PASS [webkit] AC2 play starts the clock — 0:02 / 0:53 label=Pause
+PASS [webkit] AC2 notes scheduled into the audio graph from the parsed MusicXML — 0 → 8
+PASS [webkit] AC2 no recording and no MIDI file is fetched — checked by request log below
+PASS [webkit] AC3 a cursor is visible on both decks while playing — headA=block headB=block mark=block
+PASS [webkit] AC3 the cursor moved from where it started — 215.713437px → 274.246196px
+PASS [webkit] AC3 the measure readout tracks the position — measure 2
+PASS [webkit] AC6 one transport marks the same measure index on both decks — {"i":1,"f":0.1635132275132274,"markA":237,"markB":350,"geoA":237,"geoB":350}
+PASS [webkit] AC7 audio switches to a — {"audible":["a"],"scheduled":10,"playing":true}
+PASS [webkit] AC7 audio switches to b — {"audible":["b"],"scheduled":12,"playing":true}
+PASS [webkit] AC7 audio switches to both — {"audible":["a","b"],"scheduled":15,"playing":true}
+PASS [webkit] AC7 with right-only selected, notes still reach the graph from the right deck — {"gained":4,"audible":["b"]}
+PASS [webkit] AC2 pause holds position — {"playing":false,"label":"Play","seconds":5.540861678004535}
+PASS [webkit] AC2 stop rewinds to the start — {"playing":false,"seconds":0,"clock":"0:05 / 0:53","seek":"0"}
+PASS [webkit] AC2 resumes after stop
+PASS [webkit] AC2 no audio, MIDI or soundfont file is fetched — none
+PASS [webkit] AC10 only one external request: the OSMD CDN script — https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.9/build/opensheetmusicdisplay.min.js
+PASS [webkit] AC10 drag-and-drop opens files from outside samples/ — {"a":"my-tune.musicxml","b":"my-arrangement.musicxml","pa":0,"pb":0}
+PASS [webkit] AC8 no phrases before the report is dropped — a=0 b=0
+PASS [webkit] AC8 dropping the matching .miare.json overlays phrase boundaries — {"pa":0,"pb":2,"diag":"countermelody.musicxmlstructural melody keeps 30 of 30 melody notes2 phrasescounterpoint beam width=32, context=8 quartersselected candidate score=344.872pri
+PASS [webkit] AC9 no console error through the whole drop flow — none
+PASS [webkit] AC10 tablet 1024×768 renders without horizontal overflow — {"a":{"x":16,"y":143,"w":488},"b":{"x":520,"y":143,"w":488},"overflow":false}
+PASS [webkit] AC9 tablet: no console error — none
+PASS [webkit] AC10 mobile 375×667 renders without horizontal overflow — {"a":{"x":16,"y":261,"w":343},"b":{"x":16,"y":1390,"w":343},"overflow":false}
+PASS [webkit] AC9 mobile: no console error — none
+PASS [webkit] EDGE one score open: audio chooser disabled, still playable — {"audioDisabled":true,"audible":["a"],"playEnabled":true}
+PASS [webkit] EDGE broken MusicXML gives a reason and keeps the open score — Could not read broken.musicxml: not readable as XML
+PASS [webkit] EDGE a report naming no open score does not break the page — {"status":"Could not read broken.musicxml: not readable as XML","stillOpen":"solo.musicxml"}
+PASS [webkit] EDGE malformed .miare.json reports a reason — Could not read bad.miare.json: JSON Parse error: Expected '}'
+PASS [webkit] EDGE seeking to the very end stays in range — {"seconds":17.77,"total":17.77777777777778,"pos":{"i":7,"f":0.9964999999999993}}
+PASS [webkit] EDGE tempo "0" keeps a finite duration — total=19.2
+PASS [webkit] EDGE tempo "999" keeps a finite duration — total=6.4
+PASS [webkit] EDGE tempo "" keeps a finite duration — total=19.2
+PASS [webkit] AC9 no page error across the edge cases — none
