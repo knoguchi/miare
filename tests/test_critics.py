@@ -1,16 +1,15 @@
 """
-Critic tests: the first three of DESIGN.md §9.5's eight evaluators, called on
-one candidate pitch instead of inferred from a finished arrangement.
+Critic tests: DESIGN.md §9.5's eight evaluators, called on one candidate pitch
+instead of inferred from a finished arrangement.
 
 Everything here is a preference, not a hard rule. A critic returns a number and
 its reasons; nothing it says can keep a pitch out of the output — that is
 `check_hard_constraints`, covered in `tests/test_hard_constraints.py`.
 
-The three extracted critics each own one key of the scorer's breakdown dict and
-may write no other. The five still inline in `_score_action` (phrase,
-source_language, source_identity, instrument, lookahead) are #4b's work, and
-`TestCriticSeam` pins how far the extraction has got so a half-moved critic
-fails a test instead of passing quietly.
+Each critic owns one key of the scorer's breakdown dict and may write no other.
+`TestCriticSeam` pins that the extraction is complete — the scorer computes no
+breakdown key by hand — so a half-moved critic fails a test instead of passing
+quietly.
 
 Weights come from `CRITIC_WEIGHTS`, keyed by voice relationship (DESIGN.md
 §11.3). `countermelody` is all 1.0 and reproduces the coefficients this module
@@ -36,8 +35,13 @@ from miare.counterpoint import (
     CriticInput,
     CriticScore,
     HarmonyCritic,
+    InstrumentCritic,
+    LookaheadCritic,
     MelodyCritic,
+    PhraseCritic,
     SlotContext,
+    SourceIdentityCritic,
+    SourceLanguageCritic,
     build_critics,
     critic_weights,
 )
@@ -415,18 +419,70 @@ class TestWeights:
         assert build_critics(CounterpointConfig().relationship)["melody"].weight == 1.0
 
 
+class TestRemainingFiveCritics:
+    """One candidate each for the five critics extracted by #9, scored without
+    running the beam search."""
+
+    def test_phrase_rewards_a_cadence_it_lands_cleanly(self) -> None:
+        state = BeamState(previous_midi=60, previous_melody=74)
+        # Consonant, stepwise, on the harmonic root, at the desired register:
+        # the cadential root (1.5), consonance (2.0) and step (0.8), with no
+        # register drift to deduct.
+        score = _score(
+            PhraseCritic(COUNTERMELODY),
+            state,
+            60,
+            slot=_slot(cadence=True),
+        )
+        assert score.terms == [1.5, -0.0, 2.0, 0.8]
+
+    def test_source_language_penalises_a_duration_the_source_never_uses(
+        self,
+    ) -> None:
+        state = BeamState(previous_midi=60, previous_melody=74)
+        # The stub vocabulary is empty, so the duration is foreign: -0.55.
+        score = _score(SourceLanguageCritic(COUNTERMELODY), state, 62)
+        assert score.terms == [-0.55]
+
+    def test_source_identity_keeps_the_principal_melody_separate(self) -> None:
+        state = BeamState(previous_midi=60, previous_melody=74)
+        # Melody at 72 against a candidate at 60 is a 12-semitone gap, inside
+        # the 5..16 perceptual-separation band: 1.0 * structural_importance.
+        score = _score(SourceIdentityCritic(COUNTERMELODY), state, 60)
+        assert score.terms == [0.5]
+
+    def test_instrument_prefers_the_comfortable_range(self) -> None:
+        state = BeamState(previous_midi=60, previous_melody=74)
+        inside = _score(InstrumentCritic(COUNTERMELODY), state, 60)
+        outside = _score(InstrumentCritic(COUNTERMELODY), state, CELLO.min_midi)
+        assert inside.terms == [0.7]
+        assert outside.terms == [-0.8]
+
+    def test_lookahead_rewards_a_consonance_with_the_next_melody_note(
+        self,
+    ) -> None:
+        state = BeamState(previous_midi=60, previous_melody=74)
+        # A fourth below the upcoming melody note is a consonant interval
+        # class; with no RNG supplied the tie-breaking jitter stays absent.
+        score = _score(
+            LookaheadCritic(COUNTERMELODY),
+            state,
+            60,
+            context=_context(future_melody=67),
+        )
+        assert score.terms == [0.35]
+
+
 # ---------------------------------------------------------------------------
 # How far the extraction has got
 # ---------------------------------------------------------------------------
 
 class TestCriticSeam:
-    """Three of eight critics are objects; the scorer must no longer compute
-    their keys itself, and must still compute the other five."""
+    """All eight critics are objects; the scorer must compute none of their
+    keys itself."""
 
-    def test_build_critics_returns_the_three_extracted_so_far(self) -> None:
-        assert set(build_critics("countermelody")) == {
-            "melody", "counterpoint", "harmony"
-        }
+    def test_build_critics_returns_all_eight(self) -> None:
+        assert set(build_critics("countermelody")) == set(CRITIC_NAMES)
 
     def test_critic_names_match_the_design_document_order(self) -> None:
         assert CRITIC_NAMES == (
@@ -446,20 +502,8 @@ class TestCriticSeam:
         from miare.counterpoint import _score_action
 
         body = inspect.getsource(_score_action)
-        for name in ("melody", "counterpoint", "harmony"):
+        for name in CRITIC_NAMES:
             assert f'breakdown["{name}"]' not in body, name
-
-    def test_the_scorer_still_owns_the_five_unextracted_keys(self) -> None:
-        import inspect
-
-        from miare.counterpoint import _score_action
-
-        body = inspect.getsource(_score_action)
-        for name in (
-            "phrase", "source_language", "source_identity",
-            "instrument", "lookahead",
-        ):
-            assert f'breakdown["{name}"]' in body, name
 
     def test_every_critic_stage_has_a_method(self) -> None:
         for critic in build_critics("countermelody").values():
@@ -495,7 +539,10 @@ class TestScorerStillAgreesWithTheCritics:
             data.song, data.profile, data.config, data.slot, data.state,
             data.midi, data.context, data.candidate, Random(1), critics,
         )
+        # `LookaheadCritic` draws its tie-breaking jitter from the RNG, so the
+        # direct call needs an identically-seeded one to land on the same value.
+        direct = replace(data, rng=Random(1))
         for name, critic in critics.items():
             assert action.breakdown[name] == pytest.approx(
-                critic.score(data).value
+                critic.score(direct).value
             ), name

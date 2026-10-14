@@ -51,9 +51,9 @@ CRITIC_NAMES: tuple[str, ...] = (
 # arrangement it produces is unchanged.
 #
 # `support` and `equal` are listed because §11.3 names them: `support` leans on
-# the principal melody staying clear, `equal` on voice independence. Only the
-# three extracted critics read these today — the five still inline in
-# `_score_action` ignore them until #4b moves them out.
+# the principal melody staying clear, `equal` on voice independence. All eight
+# critics read these, so a relationship's multipliers now apply to the whole
+# evaluation rather than a third of it.
 CRITIC_WEIGHTS: dict[str, dict[str, float]] = {
     "countermelody": {name: 1.0 for name in CRITIC_NAMES},
     "support": {**{name: 1.0 for name in CRITIC_NAMES}, "source_identity": 1.4},
@@ -723,6 +723,10 @@ class CriticInput:
 
     `midi is None` is a rest. A rest is a real candidate — `CounterpointCritic`
     scores it — so critics check for it rather than assuming a pitch.
+
+    `rng` is only read by `LookaheadCritic`, for the tie-breaking jitter that
+    makes an otherwise-tied beam deterministic under a seed. It is optional so
+    a unit test can build a `CriticInput` for any other critic without one.
     """
 
     song: SongIR
@@ -733,6 +737,7 @@ class CriticInput:
     midi: int | None
     context: SlotContext
     candidate: CandidateContext
+    rng: Random | None = None
 
 
 @dataclass
@@ -951,11 +956,219 @@ class HarmonyCritic(Critic):
             score.add(-0.25)
 
 
-def build_critics(relationship: str) -> dict[str, Critic]:
-    """The extracted critics for a voice relationship, keyed by breakdown key.
+class PhraseCritic(Critic):
+    """Does the candidate land the phrase? Register drift across the phrase,
+    and the cadence itself — consonance, a stepwise arrival, the harmonic root.
 
-    The five critics still inline in `_score_action` are absent; #4b adds them.
+    Register is a phrase-level concern rather than a melodic one: a line can be
+    shapely on its own terms and still sit in the wrong octave for the phrase.
     """
+
+    name = "phrase"
+    stages = ("cadential_root", "register", "cadence")
+
+    def _cadential_root(self, score: CriticScore, data: CriticInput) -> None:
+        midi = data.midi
+        if midi is None:
+            return
+        harmony_root = data.context.harmony_root
+        if harmony_root is not None and data.slot.cadence and midi % 12 == harmony_root:
+            score.add(1.5, "cadential harmonic root")
+
+    def _register(self, score: CriticScore, data: CriticInput) -> None:
+        if data.midi is None:
+            return
+        score.add(-abs(data.midi - data.context.desired_register) * 0.035)
+
+    def _cadence(self, score: CriticScore, data: CriticInput) -> None:
+        if data.midi is None or not data.slot.cadence:
+            return
+        if data.candidate.consonant:
+            score.add(2.0, "consonant phrase ending")
+        if abs(data.candidate.motion) <= 2:
+            score.add(0.8, "stepwise cadential arrival")
+
+
+class SourceLanguageCritic(Critic):
+    """Does the candidate speak the source's own vocabulary? Its duration
+    against the analysed rhythmic vocabulary, and its distance from the
+    register the source voices actually occupy.
+
+    This is the grammar of the piece rather than its themes; the specific
+    thematic material is `SourceIdentityCritic`'s business.
+    """
+
+    name = "source_language"
+    stages = ("rhythmic_vocabulary", "source_register")
+
+    def _rhythmic_vocabulary(self, score: CriticScore, data: CriticInput) -> None:
+        if data.midi is None:
+            return
+        duration_key = fraction_text(data.slot.duration)
+        rhythm_count = data.song.musical_language.rhythmic_vocabulary.get(
+            duration_key, 0
+        )
+        if rhythm_count:
+            score.add(
+                min(1.0, log1p(rhythm_count) / 5.0),
+                "duration occurs in source rhythmic vocabulary",
+            )
+        else:
+            score.add(-0.55)
+
+    def _source_register(self, score: CriticScore, data: CriticInput) -> None:
+        midi = data.midi
+        if midi is None:
+            return
+        source_midis = data.context.source_midis
+        if not source_midis:
+            return
+        distance_to_source_register = min(
+            abs(midi - source_midi) for source_midi in source_midis
+        )
+        score.add(-distance_to_source_register * 0.025)
+
+
+class SourceIdentityCritic(Critic):
+    """Does the arrangement protect the source's own identity — the principal
+    melody staying audible, protected thematic material left room, the source's
+    bass and motif intervals preserved?
+
+    The densest of the eight, and the one DESIGN.md §11.3 re-weights most: a
+    `support` voice leans on this, an `equal` voice trades it for independence.
+    """
+
+    name = "source_identity"
+    stages = (
+        "reserved_space",
+        "phrase_entry",
+        "separation",
+        "pitch_class",
+        "cadential_bass",
+        "cadence",
+        "motif_interval",
+    )
+
+    def _reserved_space(self, score: CriticScore, data: CriticInput) -> None:
+        """Rest path only: silence that leaves protected material in the clear."""
+        if data.midi is not None:
+            return
+        if data.slot.identity_policy == "protected":
+            score.add(
+                1.4 * data.slot.structural_importance,
+                "space reserved for protected thematic material",
+            )
+
+    def _phrase_entry(self, score: CriticScore, data: CriticInput) -> None:
+        """Rest path only: an unaccompanied entry at the top of a phrase."""
+        if data.midi is not None:
+            return
+        if data.slot.start == data.context.phrase_start:
+            score.add(0.9, "unaccompanied phrase entry")
+
+    def _separation(self, score: CriticScore, data: CriticInput) -> None:
+        midi, melody_midi = data.midi, data.context.melody_midi
+        if midi is None or melody_midi is None:
+            return
+        slot = data.slot
+        spacing = data.candidate.spacing
+        if not 3 <= spacing <= 19 and midi >= melody_midi:
+            # The gate already rejected a crossing a protected phrase could
+            # have avoided, so any crossing left here is forced by the floor.
+            score.add(-1.2, "crossing unavoidable near instrument floor")
+        if 5 <= spacing <= 16:
+            score.add(
+                1.0 * slot.structural_importance,
+                "principal melody kept perceptually separate",
+            )
+        if slot.melody_activity >= 2 and slot.identity_policy == "protected":
+            score.add(-0.9)
+
+    def _pitch_class(self, score: CriticScore, data: CriticInput) -> None:
+        if data.midi is None:
+            return
+        if data.midi % 12 in data.context.source_pcs:
+            score.add(0.8 * data.slot.structural_importance)
+
+    def _cadential_bass(self, score: CriticScore, data: CriticInput) -> None:
+        midi = data.midi
+        if midi is None:
+            return
+        source_bass_midi = data.context.source_bass_midi
+        if (
+            data.slot.cadence
+            and source_bass_midi is not None
+            and midi % 12 == source_bass_midi % 12
+        ):
+            score.add(1.6, "preserved source bass class at cadence")
+
+    def _cadence(self, score: CriticScore, data: CriticInput) -> None:
+        if data.midi is None or not data.slot.cadence:
+            return
+        score.add(0.6 * data.slot.structural_importance)
+
+    def _motif_interval(self, score: CriticScore, data: CriticInput) -> None:
+        if data.midi is None:
+            return
+        motion = data.candidate.motion
+        if motion and abs(motion) in data.context.motif_intervals:
+            score.add(0.35, "motion drawn from a recurring source motif interval")
+
+
+class InstrumentCritic(Critic):
+    """Is the pitch comfortable on the target instrument? Inside the preferred
+    range rather than merely inside the playable one.
+
+    The playable limits are a hard constraint the gate enforces, so by the time
+    a candidate is scored the only question left is how idiomatic it is.
+    """
+
+    name = "instrument"
+    stages = ("preferred_range",)
+
+    def _preferred_range(self, score: CriticScore, data: CriticInput) -> None:
+        midi = data.midi
+        if midi is None:
+            return
+        profile = data.profile
+        if profile.preferred_min <= midi <= profile.preferred_max:
+            score.add(0.7)
+        else:
+            score.add(-0.8)
+
+
+class LookaheadCritic(Critic):
+    """Does the candidate leave the next primary-melody event somewhere good,
+    and which way does a tie break?
+
+    The jitter is the beam's tie-breaker. It is drawn from the seeded `rng` on
+    every scored pitch, so it must be awarded once per candidate and in this
+    position: consuming the stream anywhere else reorders a tied beam and
+    changes the arrangement even though no coefficient moved.
+    """
+
+    name = "lookahead"
+    stages = ("future_melody", "jitter")
+
+    def _future_melody(self, score: CriticScore, data: CriticInput) -> None:
+        midi = data.midi
+        if midi is None:
+            return
+        future_melody = data.context.future_melody
+        if future_melody is not None:
+            future_interval = (future_melody - midi) % 12
+            if future_interval in CONSONANT_INTERVAL_CLASSES:
+                score.add(0.35, "compatible with upcoming primary-melody context")
+
+    def _jitter(self, score: CriticScore, data: CriticInput) -> None:
+        if data.midi is None or data.rng is None:
+            return
+        score.add(data.rng.random() * 1e-7)
+
+
+def build_critics(relationship: str) -> dict[str, Critic]:
+    """All eight critics of DESIGN.md §9.5 for a voice relationship, keyed by
+    breakdown key."""
     weights = critic_weights(relationship)
     return {
         critic.name: critic
@@ -963,6 +1176,11 @@ def build_critics(relationship: str) -> dict[str, Critic]:
             MelodyCritic(weights),
             CounterpointCritic(weights),
             HarmonyCritic(weights),
+            PhraseCritic(weights),
+            SourceLanguageCritic(weights),
+            SourceIdentityCritic(weights),
+            InstrumentCritic(weights),
+            LookaheadCritic(weights),
         )
     }
 
@@ -984,21 +1202,17 @@ def _score_action(
     Preference arithmetic only. Callers run `check_hard_constraints` first;
     this function never rejects, so every candidate reaching it is playable.
 
-    Three of DESIGN.md §9.5's eight critics — melody, counterpoint, harmony —
-    are objects now; the other five are still the inline blocks below, and #4b
-    moves them. A stage of an extracted critic runs where its arithmetic used
-    to sit, so every critic's reasons stay in the order they were written in.
+    All eight of DESIGN.md §9.5's critics are objects; this function only
+    sequences them and threads the beam state. Each stage runs where its
+    arithmetic used to sit inline, so every critic's reasons stay in the order
+    they were written in and each bucket's terms accumulate in the same order.
     """
     if critics is None:
         critics = build_critics(config.relationship)
     breakdown = {name: 0.0 for name in CRITIC_NAMES}
     reasons: list[str] = []
     melody_midi = context.melody_midi
-    source_pcs = context.source_pcs
-    source_midis = context.source_midis
     source_ids = list(context.source_ids)
-    harmony_pcs = context.harmony_pcs
-    harmony_root = context.harmony_root
 
     data = CriticInput(
         song=song,
@@ -1009,6 +1223,7 @@ def _score_action(
         midi=midi,
         context=context,
         candidate=candidate,
+        rng=rng,
     )
 
     def run(critic_name: str, stage_name: str) -> None:
@@ -1019,12 +1234,8 @@ def _score_action(
 
     if midi is None:
         run("counterpoint", "rest")
-        if slot.identity_policy == "protected":
-            breakdown["source_identity"] += 1.4 * slot.structural_importance
-            reasons.append("space reserved for protected thematic material")
-        if slot.start == context.phrase_start:
-            breakdown["source_identity"] += 0.9
-            reasons.append("unaccompanied phrase entry")
+        run("source_identity", "reserved_space")
+        run("source_identity", "phrase_entry")
         action = CounterpointAction(slot, None, [], breakdown, reasons)
         new_breakdown = state.breakdown.copy()
         for key, value in breakdown.items():
@@ -1057,71 +1268,28 @@ def _score_action(
     run("counterpoint", "relative_motion")
 
     if melody_midi is not None:
-        spacing = candidate.spacing
         run("counterpoint", "spacing")
-        if not 3 <= spacing <= 19 and midi >= melody_midi:
-            # The gate already rejected a crossing a protected phrase could
-            # have avoided, so any crossing left here is forced by the floor.
-            breakdown["source_identity"] -= 1.2
-            reasons.append("crossing unavoidable near instrument floor")
-        if 5 <= spacing <= 16:
-            breakdown["source_identity"] += 1.0 * slot.structural_importance
-            reasons.append("principal melody kept perceptually separate")
-        if slot.melody_activity >= 2 and slot.identity_policy == "protected":
-            breakdown["source_identity"] -= 0.9
+        run("source_identity", "separation")
 
     run("harmony", "pitch_class_support")
-    if midi % 12 in source_pcs:
-        breakdown["source_identity"] += 0.8 * slot.structural_importance
-    if harmony_root is not None and slot.cadence and midi % 12 == harmony_root:
-        breakdown["phrase"] += 1.5
-        reasons.append("cadential harmonic root")
-    if (
-        slot.cadence
-        and context.source_bass_midi is not None
-        and midi % 12 == context.source_bass_midi % 12
-    ):
-        breakdown["source_identity"] += 1.6
-        reasons.append("preserved source bass class at cadence")
+    run("source_identity", "pitch_class")
+    run("phrase", "cadential_root")
+    run("source_identity", "cadential_bass")
 
-    breakdown["phrase"] -= abs(midi - context.desired_register) * 0.035
-    if slot.cadence:
-        if consonant:
-            breakdown["phrase"] += 2.0
-            reasons.append("consonant phrase ending")
-        if abs(motion) <= 2:
-            breakdown["phrase"] += 0.8
-            reasons.append("stepwise cadential arrival")
-        breakdown["source_identity"] += 0.6 * slot.structural_importance
+    run("phrase", "register")
+    run("phrase", "cadence")
+    run("source_identity", "cadence")
 
-    duration_key = fraction_text(slot.duration)
-    rhythm_count = song.musical_language.rhythmic_vocabulary.get(duration_key, 0)
-    if rhythm_count:
-        breakdown["source_language"] += min(1.0, log1p(rhythm_count) / 5.0)
-        reasons.append("duration occurs in source rhythmic vocabulary")
-    else:
-        breakdown["source_language"] -= 0.55
-    if source_midis:
-        distance_to_source_register = min(abs(midi - source_midi) for source_midi in source_midis)
-        breakdown["source_language"] -= distance_to_source_register * 0.025
-    if motion and abs(motion) in context.motif_intervals:
-        breakdown["source_identity"] += 0.35
-        reasons.append("motion drawn from a recurring source motif interval")
+    run("source_language", "rhythmic_vocabulary")
+    run("source_language", "source_register")
+    run("source_identity", "motif_interval")
 
-    if profile.preferred_min <= midi <= profile.preferred_max:
-        breakdown["instrument"] += 0.7
-    else:
-        breakdown["instrument"] -= 0.8
+    run("instrument", "preferred_range")
 
     run("melody", "repetition")
 
-    future_melody = context.future_melody
-    if future_melody is not None:
-        future_interval = (future_melody - midi) % 12
-        if future_interval in CONSONANT_INTERVAL_CLASSES:
-            breakdown["lookahead"] += 0.35
-            reasons.append("compatible with upcoming primary-melody context")
-    breakdown["lookahead"] += rng.random() * 1e-7
+    run("lookahead", "future_melody")
+    run("lookahead", "jitter")
 
     action = CounterpointAction(
         slot=slot,
