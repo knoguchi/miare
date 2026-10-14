@@ -55,6 +55,10 @@ main { flex: 1; min-height: 0; overflow: auto; padding: 1rem; }
 .head { width: 2px; background: #1f4fd1; margin-left: -1px; }
 .phrase { position: absolute; pointer-events: none; border-left: 2px dashed var(--phrase);
   display: none; }
+.chord { position: absolute; pointer-events: auto; transform: translateX(-50%);
+  font: 600 12px/1 ui-serif, Georgia, serif; color: #8a4b00; white-space: nowrap;
+  background: rgba(255,255,255,.85); padding: 0 .15rem; border-radius: 2px; cursor: help; }
+@media (prefers-color-scheme: dark) { .chord { color: #d79a4a; background: rgba(20,33,29,.85); } }
 .phrase span { position: absolute; bottom: -.15rem; left: .2rem; font: 600 10px/1 system-ui, sans-serif;
   color: #1f4fd1; white-space: nowrap; background: rgba(255,255,255,.82); padding: 0 .1rem; }
 #empty { max-width: 42rem; margin: 2rem auto; background: var(--paper); color: #28352f;
@@ -78,6 +82,8 @@ body.drop main { outline: 3px dashed var(--pen); outline-offset: -8px; }
     <select id="audio" title="Which parts you hear" disabled>
       <option value="all">All parts</option>
     </select>
+    <label class="inline" title="Roman numerals from the .miare.json; hover one to see what else the analyser weighed">
+      <input id="showHarmony" type="checkbox" checked> Harmony</label>
     <label class="inline">Tempo <input id="tempo" type="number" min="20" max="300" step="1" value="100" disabled> bpm</label>
   </div>
   <div class="transport">
@@ -145,6 +151,7 @@ const view = (() => {
     report: null,         // parsed .miare.json
     geo: [],              // per measure: {x, w, top, bottom, anchors}
     phraseEls: [],
+    harmonyEls: [],
     lastTop: null,
   };
 })();
@@ -323,6 +330,7 @@ function relayout() {
   view.osmd.render();
   computeGeo();
   drawPhrases();
+  drawHarmony();
 }
 
 /* A report names the arrangement it describes as `output` and the source it came from as
@@ -347,6 +355,7 @@ function attachReport(text, name) {
   }
   view.report = report;
   drawPhrases();
+  drawHarmony();
 }
 
 function afterLoad() {
@@ -539,6 +548,56 @@ function drawPhrases() {
     el.append(tag);
     view.stage.append(el);
     view.phraseEls.push(el);
+  });
+}
+
+/* ---------- harmony from the .miare.json ----------
+   analysis.harmony is one slice per half measure, each with ranked candidates and a
+   selected_degree. Draw the chosen chord as a Roman numeral under the system it
+   covers: upper case for major, lower for minor, ° for diminished, + for augmented.
+   The alternatives the analyser weighed go in the title, so hovering a label shows
+   what it rejected and why. */
+const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+
+function figure(candidate) {
+  const numeral = ROMAN[candidate.degree] || `?${candidate.degree}`;
+  const quality = candidate.quality || '';
+  if (quality === 'minor') return numeral.toLowerCase();
+  if (quality === 'diminished') return `${numeral.toLowerCase()}°`;
+  if (quality === 'augmented') return `${numeral}+`;
+  return numeral;
+}
+
+function drawHarmony() {
+  view.harmonyEls.forEach(el => el.remove());
+  view.harmonyEls = [];
+  if (!$('showHarmony').checked) return;
+  const slices = view.report?.analysis?.harmony;
+  if (!slices || !view.geo.length || !view.score) return;
+  slices.forEach(slice => {
+    const at = quarters(slice.start);
+    if (!Number.isFinite(at)) return;
+    const chosen = (slice.candidates || []).find(c => c.degree === slice.selected_degree)
+      || (slice.candidates || [])[0];
+    if (!chosen) return;
+    const { i, f } = positionInScore(at);
+    const box = view.geo[Math.min(i, view.geo.length - 1)];
+    if (!box) return;
+    const el = document.createElement('div');
+    el.className = 'chord';
+    el.style.cssText = `display:block;left:${headX(box, f)}px;top:${box.bottom + 2}px`;
+    el.textContent = figure(chosen);
+    const others = (slice.candidates || [])
+      .filter(c => c !== chosen)
+      .slice(0, 3)
+      .map(c => `${figure(c)} ${Number(c.score).toFixed(1)}${c.reasons?.length ? ' · ' + c.reasons.join(', ') : ''}`);
+    el.title = [
+      `${figure(chosen)} — score ${Number(chosen.score).toFixed(1)}`,
+      ...(chosen.reasons?.length ? [`because: ${chosen.reasons.join(', ')}`] : []),
+      ...(others.length ? ['also considered:', ...others] : []),
+    ].join('\n');
+    view.stage.append(el);
+    view.harmonyEls.push(el);
   });
 }
 
@@ -821,6 +880,7 @@ $('samples').addEventListener('change', event => {
 });
 $('play').addEventListener('click', () => (playing ? pause() : play()));
 $('stop').addEventListener('click', stop);
+$('showHarmony').addEventListener('change', drawHarmony);
 $('audio').addEventListener('change', () => {
   if (playing) { const at = now(); seek(at); }         // re-schedule from here with the new mix
 });
@@ -885,6 +945,7 @@ window.miareViewer = {
   position: () => positionAt(now() / secondsPerQuarter()),
   headLeft: () => view.head.style.left,
   phrases: () => view.phraseEls.length,
+  chords: () => view.harmonyEls.length,
 };
 
 requestAnimationFrame(frame);
